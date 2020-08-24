@@ -1,0 +1,37 @@
+version: "3.8"
+
+volumes:
+  service-tasks-volume:
+    name: service-tasks-volume
+
+networks:
+  service-tasks-network:
+    name: service-tasks-network
+
+services:
+  app:
+    container_name: service-tasks
+    ports:
+      - 8080:8080
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app/
+    depends_on:
+      - mysql
+    networks:
+      - service-tasks-network
+  
+  mysql:
+    image: mysql
+    ports: 
+      - "${DB_PORT}:${DB_PORT}"
+    environment: 
+      - MYSQL_ROOT_HOST=${DB_HOST} 
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - service-tasks-volume:/var/lib/mysql
+    networks:
+      - service-tasks-network

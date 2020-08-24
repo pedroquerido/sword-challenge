@@ -1,0 +1,20 @@
+# Golang build image
+FROM golang:1.15
+
+# Maintainer
+LABEL maintainer="Pedro Querido <pedroquerido14@gmail.com>"
+
+# Set working directory
+WORKDIR /app
+
+# Copy go mod and sum files
+COPY ./go.mod ./go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source to working directory
+COPY . .
+
+# Expose port 8080
+EXPOSE 8080
