@@ -10,6 +10,7 @@ var (
 	ErrorEmptyTask        = newError(errors.New("empty task"))
 	ErrorEmptyTaskSummary = newError(errors.New("empty task summary"))
 	ErrorEmptyTaskDate    = newError(errors.New("empty task date"))
+	ErrorUnknown          = newError(errors.New("unknown"))
 )
 
 // Error represents the error structure at repo level
