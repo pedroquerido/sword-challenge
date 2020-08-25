@@ -9,24 +9,26 @@ networks:
     name: service-tasks-network
 
 services:
-  app:
+  service-tasks:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     container_name: service-tasks
     ports:
       - 8080:8080
     restart: on-failure
     volumes:
-      - api:/usr/src/app/
+      - ./:/app
     depends_on:
       - mysql
     networks:
       - service-tasks-network
-  
+
   mysql:
     image: mysql
-    ports: 
+    ports:
       - "${DB_PORT}:${DB_PORT}"
-    environment: 
-      - MYSQL_ROOT_HOST=${DB_HOST} 
+    environment:
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
