@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
-	"github.com/pedroquerido/sword-challenge/service-tasks/cmd/task/app"
+	"github.com/pedroquerido/sword-challenge/service-tasks/cmd/api/app"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 		log.Fatalln("failed to load env vars")
 	}
 
-	app := app.NewTaskApp()
+	app := app.NewTaskAPI()
 	if err := app.Run(); err != nil {
 		log.Fatalln(err)
 	}

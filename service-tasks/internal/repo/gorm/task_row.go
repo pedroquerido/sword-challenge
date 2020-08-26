@@ -1,7 +1,6 @@
-package mysql
+package gorm
 
 import (
-	"context"
 	"time"
 
 	"github.com/pedroquerido/sword-challenge/service-tasks/pkg/task"
@@ -18,7 +17,7 @@ type taskRow struct {
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
-func fromTask(ctx context.Context, task *task.Task) *taskRow {
+func fromTask(task *task.Task) *taskRow {
 
 	return &taskRow{
 		TaskID:  task.ID,
