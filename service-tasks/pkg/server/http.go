@@ -13,30 +13,28 @@ const (
 )
 
 type httpServer struct {
-	name          string
-	listenAddress string
-	server        *http.Server
+	name    string
+	address string
+	server  *http.Server
 }
 
 // NewHTTPServer ...
 func NewHTTPServer(name, address string, handler *http.Handler) Server {
 
-	srv := &http.Server{
-		Handler: *handler,
-		Addr:    address,
-	}
-
 	return &httpServer{
-		name:          name,
-		listenAddress: srv.Addr,
-		server:        srv,
+		name:    name,
+		address: address,
+		server: &http.Server{
+			Handler: *handler,
+			Addr:    address,
+		},
 	}
 }
 
 // Run ...
 func (s *httpServer) Run() error {
 
-	log.Printf("starting %v server - address %v\n", s.name, s.listenAddress)
+	log.Printf("starting %v server - address %v\n", s.name, s.address)
 
 	err := s.server.ListenAndServe()
 
