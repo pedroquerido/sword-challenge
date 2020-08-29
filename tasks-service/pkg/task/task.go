@@ -1,11 +1,26 @@
 package task
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 // Task ...
 type Task struct {
-	ID      string    `json:"id"`
-	UserID  string    `json:"user_id"`
-	Summary string    `json:"summary"`
-	Date    time.Time `json:"date"`
+	ID      string    `json:"id" validate:"required,gt=0,uuid4"`
+	UserID  string    `json:"user_id" validate:"required,gt=0"`
+	Summary string    `json:"summary" validate:"required,gt=0,lte=2500"`
+	Date    time.Time `json:"date" validate:"required"`
+}
+
+// NewTask ...
+func NewTask(userID, summary string, date time.Time) *Task {
+
+	return &Task{
+		ID:      uuid.New().String(),
+		UserID:  userID,
+		Summary: summary,
+		Date:    date,
+	}
 }
