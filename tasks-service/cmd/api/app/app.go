@@ -16,8 +16,6 @@ func (t *taskAPI) Run() error {
 
 	cfg := config.Get()
 
-	log.Fataln(2)
-
 	/* 	_, err := gorm.NewTaskRepository(&gorm.TaskRepositoryOptions{
 		Driver:   cfg.DB.Driver,
 		Host:     cfg.DB.Host,

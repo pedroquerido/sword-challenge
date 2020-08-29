@@ -1,9 +1,7 @@
 package gorm
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/go-sql-driver/mysql" // mysql driver
 	"github.com/jinzhu/gorm"
@@ -43,18 +41,11 @@ func NewTaskRepository(options *TaskRepositoryOptions) (*TaskRepository, error) 
 		db  *gorm.DB
 	)
 
-	log.Fatalln("hello")
-
 	switch options.Driver {
 	case mySQL:
 
 		url := fmt.Sprintf(mySQLConnectionURL, options.User, options.Password, options.Host, options.Port, options.Name)
-		db, err := sql.Open("mysql", url)
-		if err != nil {
-			log.Println("1")
-		} else {
-			log.Println("2")
-		}
+		//		db, err := sql.Open("mysql", url)
 		db, err = gorm.Open(mySQL, url)
 
 	default:

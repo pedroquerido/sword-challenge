@@ -3,8 +3,7 @@ package main
 import (
 	"log"
 
-	/* 	"github.com/joho/godotenv"
-	 */"github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 	"github.com/pedroquerido/sword-challenge/service-tasks/cmd/api/app"
 )
 
