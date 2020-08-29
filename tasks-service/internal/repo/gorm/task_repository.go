@@ -3,10 +3,11 @@ package gorm
 import (
 	"fmt"
 
-	_ "github.com/go-sql-driver/mysql" // mysql driver
+	"tasks-service/internal/repo"
+	"tasks-service/pkg/task"
+
 	"github.com/jinzhu/gorm"
-	"github.com/pedroquerido/sword-challenge/service-tasks/internal/repo"
-	"github.com/pedroquerido/sword-challenge/service-tasks/pkg/task"
+	_ "github.com/jinzhu/gorm/dialects/mysql" // mysql driver
 )
 
 var _ repo.TaskRepository = (*TaskRepository)(nil)
@@ -43,9 +44,7 @@ func NewTaskRepository(options *TaskRepositoryOptions) (*TaskRepository, error) 
 
 	switch options.Driver {
 	case mySQL:
-
 		url := fmt.Sprintf(mySQLConnectionURL, options.User, options.Password, options.Host, options.Port, options.Name)
-		//		db, err := sql.Open("mysql", url)
 		db, err = gorm.Open(mySQL, url)
 
 	default:

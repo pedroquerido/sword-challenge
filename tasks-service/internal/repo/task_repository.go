@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"github.com/pedroquerido/sword-challenge/service-tasks/pkg/task"
+	"tasks-service/pkg/task"
 )
 
 // TaskRepository ...

@@ -3,9 +3,8 @@ package gorm
 import (
 	"time"
 
-	"github.com/pedroquerido/sword-challenge/service-tasks/pkg/task"
-
-	"github.com/pedroquerido/sword-challenge/service-tasks/internal/repo"
+	"tasks-service/internal/repo"
+	"tasks-service/pkg/task"
 )
 
 type taskRow struct {

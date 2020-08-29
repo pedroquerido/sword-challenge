@@ -1,33 +1,39 @@
 package app
 
 import (
-	"github.com/pedroquerido/sword-challenge/service-tasks/internal/config"
+	"log"
+	"tasks-service/internal/config"
+
+	"tasks-service/internal/repo/gorm"
 )
 
-type taskAPI struct{}
+// TaskAPI ...
+type TaskAPI struct{}
 
 // NewTaskAPI ...
-func NewTaskAPI() *taskAPI {
-	return &taskAPI{}
+func NewTaskAPI() *TaskAPI {
+	return &TaskAPI{}
 }
 
 // Run ...
-func (t *taskAPI) Run() error {
+func (t *TaskAPI) Run() error {
 
 	cfg := config.Get()
 
-	/* 	_, err := gorm.NewTaskRepository(&gorm.TaskRepositoryOptions{
+	_, err := gorm.NewTaskRepository(&gorm.TaskRepositoryOptions{
 		Driver:   cfg.DB.Driver,
 		Host:     cfg.DB.Host,
 		Port:     cfg.DB.Port,
 		User:     cfg.DB.Port,
 		Password: cfg.DB.Port,
 		Name:     cfg.DB.Port,
-	}) */
+	})
 
 	if err != nil {
 		return err
 	}
+
+	log.Println("exiting... for now")
 
 	return nil
 }
