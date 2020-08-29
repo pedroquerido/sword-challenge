@@ -1,5 +1,5 @@
 # Golang build image
-FROM golang:1.15 as build
+FROM golang:1.15 as builder
 
 # Maintainer
 LABEL maintainer="Pedro Querido <pedroquerido14@gmail.com>"
@@ -10,14 +10,16 @@ ADD . /app
 
 WORKDIR /app
 
-RUN make install build-api
+RUN go mod download
+
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ./bin/api cmd/api/main.go
 
 ####
 
-FROM scratch
+FROM alpine:latest
 
-COPY --from=build /app/bin/api /
+COPY --from=builder /app/bin/api .
 
 EXPOSE 8080
 
-ENTRYPOINT ["/api"]
+ENTRYPOINT ["./api"]

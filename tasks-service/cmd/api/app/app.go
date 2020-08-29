@@ -20,13 +20,15 @@ func (t *TaskAPI) Run() error {
 
 	cfg := config.Get()
 
+	log.Printf("read configs: %v", cfg)
+
 	_, err := gorm.NewTaskRepository(&gorm.TaskRepositoryOptions{
 		Driver:   cfg.DB.Driver,
 		Host:     cfg.DB.Host,
 		Port:     cfg.DB.Port,
-		User:     cfg.DB.Port,
-		Password: cfg.DB.Port,
-		Name:     cfg.DB.Port,
+		User:     cfg.DB.User,
+		Password: cfg.DB.Password,
+		Name:     cfg.DB.Name,
 	})
 
 	if err != nil {
@@ -35,5 +37,11 @@ func (t *TaskAPI) Run() error {
 
 	log.Println("exiting... for now")
 
+	blockForever()
+
 	return nil
+}
+
+func blockForever() {
+	select {}
 }
