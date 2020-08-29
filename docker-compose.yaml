@@ -1,0 +1,48 @@
+version: "3.8"
+
+volumes:
+  sc-volume:
+    name: sc-volume
+  database_mysql:
+    
+networks:
+  sc-network:
+    name: sc-network
+
+services:
+  tasks-service:
+    build:
+      context: ./tasks-service
+      dockerfile: Dockerfile
+    container_name: tasks-service
+    ports:
+      - 8080:8080
+    environment:
+      - DB_DRIVER=${DB_DRIVER}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    restart: on-failure
+    volumes:
+      - ./:/app
+    depends_on:
+      - mysql-sc
+    networks:
+      - sc-network
+
+  mysql-sc:
+    image: mysql:5.7
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      - MYSQL_ROOT_HOST=${DB_HOST} 
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - database_mysql:/var/lib/mysql
+    networks:
+      - sc-network

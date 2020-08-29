@@ -43,6 +43,8 @@ func NewTaskRepository(options *TaskRepositoryOptions) (*TaskRepository, error) 
 		db  *gorm.DB
 	)
 
+	log.Fatalln("hello")
+
 	switch options.Driver {
 	case mySQL:
 
