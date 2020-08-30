@@ -4,24 +4,37 @@ import (
 	"context"
 	"tasks-service/internal/repo"
 	"tasks-service/pkg/task"
+	"time"
+
+	"gopkg.in/go-playground/validator.v9"
 )
 
 // TaskService represents the Use Case layer containing application specific business rules
 type TaskService struct {
-	repo repo.TaskRepository
+	repo     repo.TaskRepository
+	validate *TaskValidator
 }
 
 // NewTaskService initializes and returns a new TaskService instance
-func NewTaskService(repo repo.TaskRepository) *TaskService {
+func NewTaskService(repo repo.TaskRepository, validate *validator.Validate) *TaskService {
 
 	return &TaskService{
-		repo: repo,
+		repo:     repo,
+		validate: NewTaskValidator(validate),
 	}
 }
 
-func (s *TaskService) createTask(ctx context.Context) (string, error) {
+func (s *TaskService) createTask(ctx context.Context, userID, summary string, date time.Time) (string, error) {
 
-	return "", nil
+	task := task.NewTask(userID, summary, date)
+
+	if err := s.validate.Validate(task); err != nil {
+		return "", err
+	}
+
+	// Call repo
+
+	return task.ID, nil
 }
 
 func (s *TaskService) listTasks(ctx context.Context) ([]*task.Task, error) {

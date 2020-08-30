@@ -1,13 +1,15 @@
 package gorm
 
 import (
+	"errors"
 	"fmt"
 
 	"tasks-service/internal/repo"
+	pkgError "tasks-service/pkg/error"
 	"tasks-service/pkg/task"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql" // mysql driver
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 var _ repo.TaskRepository = (*TaskRepository)(nil)
@@ -45,7 +47,7 @@ func NewTaskRepository(options *TaskRepositoryOptions) (*TaskRepository, error) 
 	switch options.Driver {
 	case mySQL:
 		url := fmt.Sprintf(mySQLConnectionURL, options.User, options.Password, options.Host, options.Port, options.Name)
-		db, err = gorm.Open(mySQL, url)
+		db, err = gorm.Open(mysql.Open(url), &gorm.Config{})
 
 	default:
 		err = fmt.Errorf("unknown driver %s", options.Driver)
@@ -64,14 +66,14 @@ func NewTaskRepository(options *TaskRepositoryOptions) (*TaskRepository, error) 
 func (r *TaskRepository) Save(task *task.Task) error {
 
 	row := fromTask(task)
-	err := row.validate()
-	if err != nil {
-		return err
-	}
 
-	err = r.db.Debug().Create(&row).Error
-	if err != nil {
-		return repo.ErrorUnknown.Wrap(err)
+	if err := r.db.Create(&row).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrInvalidField) {
+			return pkgError.NewError(repo.ErrorInvalidSave).WithDetails(err.Error())
+		}
+
+		return pkgError.NewError(repo.ErrorUnknown).WithDetails(err.Error())
 	}
 
 	return nil
@@ -82,8 +84,12 @@ func (r *TaskRepository) Find(id string) (*task.Task, error) {
 
 	row := taskRow{}
 
-	if err := r.db.Debug().Where("id = ?", id).Take(&row).Error; err != nil {
-		return &task.Task{}, repo.ErrorUnknown.Wrap(err)
+	if err := r.db.Where("task_id = ?", id).Take(&row).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, pkgError.NewError(repo.ErrorNotFound).WithDetails(err.Error())
+		}
+
+		return nil, pkgError.NewError(repo.ErrorUnknown).WithDetails(err.Error())
 	}
 
 	return row.toTask(), nil
@@ -95,7 +101,7 @@ func (r *TaskRepository) List() ([]*task.Task, error) {
 	rows := []taskRow{}
 
 	if err := r.db.Debug().Find(&rows).Error; err != nil {
-		return []*task.Task{}, repo.ErrorUnknown.Wrap(err)
+		return nil, pkgError.NewError(repo.ErrorUnknown).WithDetails(err.Error())
 	}
 
 	tasks := make([]*task.Task, 0, len(rows))

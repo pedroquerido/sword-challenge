@@ -1,22 +1,25 @@
 package task_test
 
 import (
-	"os"
 	"tasks-service/pkg/rand"
 	"tasks-service/pkg/task"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
-
-	"gopkg.in/go-playground/validator.v9"
 )
 
-func TestMain(m *testing.M) {
+const (
+	defaultUserID        = "user_id"
+	defaultSummaryLength = 10
 
-	testTaskValidator = task.NewValidator(validator.New())
+	failedTemplate  = "FAILED - expected %v but got %v\n"
+	successTemplate = "PASSED - expected %v and got %v\n"
+)
 
-	os.Exit(m.Run())
-}
+var (
+	defaultDate time.Time = time.Now()
+)
 
 func TestNewTaskEqualsTask(t *testing.T) {
 

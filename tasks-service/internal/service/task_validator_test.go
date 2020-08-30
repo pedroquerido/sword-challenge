@@ -1,7 +1,8 @@
-package task_test
+package service_test
 
 import (
 	"errors"
+	"tasks-service/internal/service"
 	"tasks-service/pkg/rand"
 	"tasks-service/pkg/task"
 	"testing"
@@ -23,7 +24,7 @@ const (
 )
 
 var (
-	testTaskValidator *task.Validator
+	testTaskValidator *service.TaskValidator
 
 	defaultDate time.Time = time.Now()
 )
@@ -48,11 +49,11 @@ func TestValidateTaskCorrectTask(t *testing.T) {
 func TestValidateTaskEmptyTask(t *testing.T) {
 
 	testTask := &task.Task{}
-	expectedResult := task.ErrorInvalidTask
+	expectedResult := service.ErrorInvalidTask
 
 	err := testTaskValidator.Validate(testTask)
 
-	if err != nil && errors.Is(err, task.ErrorInvalidTask) {
+	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
 		t.Logf(successTemplate, expectedResult, err)
 	} else {
 		t.Errorf(failedTemplate, expectedResult, err)
@@ -66,11 +67,11 @@ func TestValidateTaskEmptyID(t *testing.T) {
 		Summary: rand.String(defaultSummaryLength),
 		Date:    defaultDate,
 	}
-	expectedResult := task.ErrorInvalidTask
+	expectedResult := service.ErrorInvalidTask
 
 	err := testTaskValidator.Validate(testTask)
 
-	if err != nil && errors.Is(err, task.ErrorInvalidTask) {
+	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
 		t.Logf(successTemplate, expectedResult, err)
 	} else {
 		t.Errorf(failedTemplate, expectedResult, err)
@@ -85,11 +86,11 @@ func TestValidateTaskIDNoUUID(t *testing.T) {
 		Summary: rand.String(defaultSummaryLength),
 		Date:    defaultDate,
 	}
-	expectedResult := task.ErrorInvalidTask
+	expectedResult := service.ErrorInvalidTask
 
 	err := testTaskValidator.Validate(testTask)
 
-	if err != nil && errors.Is(err, task.ErrorInvalidTask) {
+	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
 		t.Logf(successTemplate, expectedResult, err)
 	} else {
 		t.Errorf(failedTemplate, expectedResult, err)
@@ -104,11 +105,11 @@ func TestValidateTaskIDBadUUID(t *testing.T) {
 		Summary: rand.String(defaultSummaryLength),
 		Date:    defaultDate,
 	}
-	expectedResult := task.ErrorInvalidTask
+	expectedResult := service.ErrorInvalidTask
 
 	err := testTaskValidator.Validate(testTask)
 
-	if err != nil && errors.Is(err, task.ErrorInvalidTask) {
+	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
 		t.Logf(successTemplate, expectedResult, err)
 	} else {
 		t.Errorf(failedTemplate, expectedResult, err)
@@ -122,11 +123,11 @@ func TestValidateTaskEmptyUserID(t *testing.T) {
 		Summary: rand.String(defaultSummaryLength),
 		Date:    defaultDate,
 	}
-	expectedResult := task.ErrorInvalidTask
+	expectedResult := service.ErrorInvalidTask
 
 	err := testTaskValidator.Validate(testTask)
 
-	if err != nil && errors.Is(err, task.ErrorInvalidTask) {
+	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
 		t.Logf(successTemplate, expectedResult, err)
 	} else {
 		t.Errorf(failedTemplate, expectedResult, err)
@@ -140,11 +141,11 @@ func TestValidateTaskEmptySummary(t *testing.T) {
 		UserID: defaultUserID,
 		Date:   defaultDate,
 	}
-	expectedResult := task.ErrorInvalidTask
+	expectedResult := service.ErrorInvalidTask
 
 	err := testTaskValidator.Validate(testTask)
 
-	if err != nil && errors.Is(err, task.ErrorInvalidTask) {
+	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
 		t.Logf(successTemplate, expectedResult, err)
 	} else {
 		t.Errorf(failedTemplate, expectedResult, err)
@@ -159,11 +160,11 @@ func TestValidateTaskSummaryTooLong(t *testing.T) {
 		Summary: rand.String(failureSummaryLength),
 		Date:    defaultDate,
 	}
-	expectedResult := task.ErrorInvalidTask
+	expectedResult := service.ErrorInvalidTask
 
 	err := testTaskValidator.Validate(testTask)
 
-	if err != nil && errors.Is(err, task.ErrorInvalidTask) {
+	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
 		t.Logf(successTemplate, expectedResult, err)
 	} else {
 		t.Errorf(failedTemplate, expectedResult, err)
@@ -177,11 +178,11 @@ func TestValidateTaskEmptyDate(t *testing.T) {
 		UserID:  defaultUserID,
 		Summary: rand.String(defaultSummaryLength),
 	}
-	expectedResult := task.ErrorInvalidTask
+	expectedResult := service.ErrorInvalidTask
 
 	err := testTaskValidator.Validate(testTask)
 
-	if err != nil && errors.Is(err, task.ErrorInvalidTask) {
+	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
 		t.Logf(successTemplate, expectedResult, err)
 	} else {
 		t.Errorf(failedTemplate, expectedResult, err)

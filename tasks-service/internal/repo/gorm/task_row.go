@@ -3,17 +3,18 @@ package gorm
 import (
 	"time"
 
-	"tasks-service/internal/repo"
 	"tasks-service/pkg/task"
+
+	"gorm.io/gorm"
 )
 
 type taskRow struct {
-	ID        uint64    `gorm:"primary_key;auto_increment" json:"-"`
-	TaskID    string    `gorm:"not null; unique;" json:"id"`
-	Summary   string    `gorm:"size:2500;not null;" json:"summary"`
-	Date      time.Time `gorm:"not null" json:"date"`
-	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
+	ID        uint64    `gorm:"colummn:id;primary_key;auto_increment" json:"-"`
+	TaskID    string    `gorm:"colummn:task_id;not null; unique;" json:"id"`
+	Summary   string    `gorm:"collumn:summary;size:2500;not null;" json:"summary"`
+	Date      time.Time `gorm:"collumn:date;not null" json:"date"`
+	CreatedAt time.Time `gorm:"collumn:created_at" json:"created_at"`
+	UpdatedAt time.Time `gorm:"collumn:updated_at" json:"updated_at"`
 }
 
 func fromTask(task *task.Task) *taskRow {
@@ -34,19 +35,16 @@ func (r *taskRow) toTask() *task.Task {
 	}
 }
 
-func (r *taskRow) validate() error {
+func (r *taskRow) BeforeCreate(tx *gorm.DB) (err error) {
 
-	if r == nil {
-		return repo.ErrorEmptyTask
-	}
+	r.CreatedAt = time.Now().UTC()
 
-	if r.Summary == "" {
-		return repo.ErrorEmptyTaskSummary
-	}
+	return nil
+}
 
-	if r.Date.IsZero() {
-		return repo.ErrorEmptyTaskDate
-	}
+func (r *taskRow) BeforeUpdate(tx *gorm.DB) (err error) {
+
+	r.UpdatedAt = time.Now().UTC()
 
 	return nil
 }

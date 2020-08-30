@@ -1,12 +1,5 @@
 package error
 
-import "errors"
-
-var (
-	// ErrorUnknown represents the default error
-	ErrorUnknown = errors.New("unknown error")
-)
-
 // Error represents a structure and set methods for better error handling
 type Error struct {
 	error

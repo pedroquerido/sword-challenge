@@ -1,45 +1,12 @@
 package repo
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
-// Known Error types
 var (
-	ErrorEmptyTask        = newError(errors.New("empty task"))
-	ErrorEmptyTaskSummary = newError(errors.New("empty task summary"))
-	ErrorEmptyTaskDate    = newError(errors.New("empty task date"))
-	ErrorUnknown          = newError(errors.New("unknown"))
+	// ErrorInvalidSave represents the error obtained by trying to persist a Task that does not meet requirements
+	ErrorInvalidSave = errors.New("invalid save")
+	// ErrorNotFound represents the error obtained by trying to find a Task that does not exist in the repo
+	ErrorNotFound = errors.New("not found")
+	// ErrorUnknown represents the default error
+	ErrorUnknown = errors.New("unknown error")
 )
-
-// Error represents the error structure at repo level
-type Error struct {
-	error
-}
-
-func newError(err error) Error {
-
-	return Error{
-		error: err,
-	}
-}
-
-// Error returns error string representation
-func (c Error) Error() string {
-
-	return c.error.Error()
-}
-
-// Unwrap returns underlying wrapped error
-func (c Error) Unwrap() error {
-
-	return c.error
-}
-
-// Wrap returns a wrapped (shadowed) error
-func (c Error) Wrap(err error) Error {
-
-	c.error = fmt.Errorf(c.Error()+": %w", err)
-	return c
-}

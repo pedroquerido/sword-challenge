@@ -5,6 +5,8 @@ import (
 	"tasks-service/internal/config"
 	"tasks-service/internal/repo/gorm"
 	"tasks-service/internal/service"
+
+	"gopkg.in/go-playground/validator.v9"
 )
 
 // TaskAPI ...
@@ -34,7 +36,9 @@ func (t *TaskAPI) Run() error {
 		return err
 	}
 
-	service.NewTaskService(taskRepo)
+	validate := validator.New()
+
+	service.NewTaskService(taskRepo, validate)
 
 	log.Println("exiting... for now")
 	blockForever()

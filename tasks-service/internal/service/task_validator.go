@@ -1,35 +1,32 @@
-package task
+package service
 
 import (
 	"errors"
 	"fmt"
 	customError "tasks-service/pkg/error"
+	"tasks-service/pkg/task"
 
 	"gopkg.in/go-playground/validator.v9"
 )
 
-var (
-	// ErrorInvalidTask represents the error obtained by validating a task that fails to meet requirements
-	ErrorInvalidTask = errors.New("invalid task")
-)
-
-// Validator ...
-type Validator struct {
+// TaskValidator ...
+type TaskValidator struct {
 	validate *validator.Validate
 }
 
-// NewValidator ...
-func NewValidator(validate *validator.Validate) *Validator {
+// NewTaskValidator ...
+func NewTaskValidator(validate *validator.Validate) *TaskValidator {
 
-	return &Validator{
+	return &TaskValidator{
 		validate: validate,
 	}
 }
 
-// Validate ...
-func (v *Validator) Validate(task *Task) error {
+// Validate validates the content of a *task.Task
+//		- returns task.ErrorInvalidTask if not valid, nil if valid and customError.ErrorUnknown if an unexpected problem occurred
+func (v *TaskValidator) Validate(t *task.Task) error {
 
-	err := v.validate.Struct(task)
+	err := v.validate.Struct(t)
 	if err != nil {
 
 		var (
@@ -51,7 +48,7 @@ func (v *Validator) Validate(task *Task) error {
 			return customError.NewError(ErrorInvalidTask).WithDetails(details...)
 		}
 
-		return customError.NewError(customError.ErrorUnknown)
+		return customError.NewError(ErrorUnknown).WithDetails(err.Error())
 	}
 
 	return nil
