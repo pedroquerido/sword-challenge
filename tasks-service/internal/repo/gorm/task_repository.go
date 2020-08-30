@@ -19,6 +19,7 @@ const (
 	mySQLConnectionURL = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
 
 	connectionError = "error connecting to db: %w"
+	migrationError  = "error migrating db: %w"
 )
 
 // TaskRepository ...
@@ -34,6 +35,7 @@ type TaskRepositoryOptions struct {
 	User     string
 	Password string
 	Name     string
+	Migrate  bool
 }
 
 // NewTaskRepository ...
@@ -55,6 +57,12 @@ func NewTaskRepository(options *TaskRepositoryOptions) (*TaskRepository, error) 
 
 	if err != nil {
 		return nil, fmt.Errorf(connectionError, err)
+	}
+
+	if options.Migrate {
+		if err := db.AutoMigrate(&taskRow{}); err != nil {
+			return nil, fmt.Errorf(migrationError, err)
+		}
 	}
 
 	return &TaskRepository{

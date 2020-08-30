@@ -1,19 +1,21 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"tasks-service/cmd/api/app"
-	/* 	"github.com/joho/godotenv"
-	 */)
+)
+
+var (
+	autoMigrate = flag.Bool("auto-migrate", false, "run db migrations on startup")
+)
 
 func main() {
 
-	/* 	if err := godotenv.Load(); err != nil {
-		log.Fatalln("failed to load env vars")
-	} */
+	flag.Parse()
 
-	app := app.NewTaskAPI()
+	app := app.NewTaskAPI(*autoMigrate)
 	if err := app.Run(); err != nil {
 		log.Fatalln(err)
 	}
