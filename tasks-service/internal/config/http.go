@@ -29,4 +29,5 @@ func (http *HTTP) load() {
 	} else {
 		log.Fatalf(envVarNotDefined, httpPath)
 	}
+
 }

@@ -38,3 +38,9 @@ func (c Error) WithDetails(details ...string) Error {
 	c.details = details
 	return c
 }
+
+// GetDetails gets added context from error
+func (c Error) GetDetails() []string {
+
+	return c.details
+}

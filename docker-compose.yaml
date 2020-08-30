@@ -25,7 +25,7 @@ services:
       - DB_PASSWORD=${MYSQL_PASSWORD}
       - DB_NAME=${MYSQL_TASKS_DB_NAME}
       - HTTP_PORT=:${TASKS_HTTP_PORT}
-      - HTTP_PATH=${TASKS_HTTP_PATH}
+      - HTTP_PATH=/${TASKS_HTTP_PATH}
     restart: on-failure
     volumes:
       - ./:/app

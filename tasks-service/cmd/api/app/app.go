@@ -2,12 +2,13 @@ package app
 
 import (
 	"log"
+	"os"
+	"os/signal"
 	"tasks-service/internal/config"
 	"tasks-service/internal/repo/gorm"
 	"tasks-service/internal/router"
 	"tasks-service/internal/service"
-	"tasks-service/pkg/shutdown"
-	"time"
+	"tasks-service/pkg/server"
 
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -43,19 +44,22 @@ func (t *TaskAPI) Run() error {
 
 	service := service.NewTaskService(taskRepo, validate)
 
-	router.New(cfg.HTTP.Path, service)
+	router := router.New(cfg.HTTP.Path, service, validate)
 
-	//httpServer := server.NewHTTPServer()
+	httpServer := server.NewHTTPServer("tasks http", cfg.HTTP.Port, router.GetHTTPHandler())
+	go httpServer.Run()
 
-	// Shutdown
-	shutdown.NewShutdown(time.Duration(1))
-
-	log.Println("exiting... for now")
-	blockForever()
+	waitForSignal()
+	httpServer.Stop()
 
 	return nil
 }
 
-func blockForever() {
-	select {}
+func waitForSignal() {
+
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, os.Interrupt)
+	s := <-signalChannel
+
+	log.Printf("received interrupt signal: %v", s)
 }

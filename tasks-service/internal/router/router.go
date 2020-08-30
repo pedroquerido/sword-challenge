@@ -5,6 +5,18 @@ import (
 	"tasks-service/internal/service"
 
 	"github.com/gorilla/mux"
+	"gopkg.in/go-playground/validator.v9"
+)
+
+const (
+	routeTasks        = "/tasks"
+	routeTasksID      = "/tasks/{taskID}"
+	routeUsersIDTasks = "/users/{userID/tasks"
+
+	methodPost   = "POST"
+	methodGet    = "GET"
+	methodPatch  = "PATCH"
+	methodDelete = "DELETE"
 )
 
 // Router ...
@@ -12,15 +24,17 @@ type Router struct {
 	basePath string
 	service  *service.TaskService
 	router   *mux.Router
+	validate *RequestValidator
 }
 
 // New ...
-func New(basePath string, service *service.TaskService) *Router {
+func New(basePath string, service *service.TaskService, validate *validator.Validate) *Router {
 
 	router := &Router{
 		basePath: basePath,
 		service:  service,
 		router:   mux.NewRouter(),
+		validate: NewRequestValidator(validate),
 	}
 
 	router.setupRoutes()
@@ -28,12 +42,14 @@ func New(basePath string, service *service.TaskService) *Router {
 	return router
 }
 
-func (r *Router) setupRoutes() {
+func (rt *Router) setupRoutes() {
+
+	rt.router.HandleFunc(rt.basePath+routeTasks, setMiddlewareJSON(rt.createTask)).Methods(methodPost)
 
 }
 
 // GetHTTPHandler ...
-func (r *Router) GetHTTPHandler() http.Handler {
+func (rt *Router) GetHTTPHandler() http.Handler {
 
-	return r.router
+	return rt.router
 }

@@ -73,7 +73,7 @@ func (r *TaskRepository) Save(task *task.Task) error {
 			return pkgError.NewError(repo.ErrorInvalidSave).WithDetails(err.Error())
 		}
 
-		return pkgError.NewError(repo.ErrorUnknown).WithDetails(err.Error())
+		return err
 	}
 
 	return nil
@@ -89,7 +89,7 @@ func (r *TaskRepository) Find(id string) (*task.Task, error) {
 			return nil, pkgError.NewError(repo.ErrorNotFound).WithDetails(err.Error())
 		}
 
-		return nil, pkgError.NewError(repo.ErrorUnknown).WithDetails(err.Error())
+		return nil, err
 	}
 
 	return row.toTask(), nil
@@ -101,7 +101,7 @@ func (r *TaskRepository) List() ([]*task.Task, error) {
 	rows := []taskRow{}
 
 	if err := r.db.Debug().Find(&rows).Error; err != nil {
-		return nil, pkgError.NewError(repo.ErrorUnknown).WithDetails(err.Error())
+		return nil, err
 	}
 
 	tasks := make([]*task.Task, 0, len(rows))

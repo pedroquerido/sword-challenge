@@ -24,7 +24,8 @@ func NewTaskService(repo repo.TaskRepository, validate *validator.Validate) *Tas
 	}
 }
 
-func (s *TaskService) createTask(ctx context.Context, userID, summary string, date time.Time) (string, error) {
+// CreateTask ...
+func (s *TaskService) CreateTask(ctx context.Context, userID, summary string, date time.Time) (string, error) {
 
 	task := task.NewTask(userID, summary, date)
 
@@ -37,22 +38,26 @@ func (s *TaskService) createTask(ctx context.Context, userID, summary string, da
 	return task.ID, nil
 }
 
-func (s *TaskService) listTasks(ctx context.Context) ([]*task.Task, error) {
+// ListTasks ...
+func (s *TaskService) ListTasks(ctx context.Context) ([]*task.Task, error) {
 
 	return nil, nil
 }
 
-func (s *TaskService) retrieveTask(ctx context.Context, taskID string) (*task.Task, error) {
+// RetrieveTask ...
+func (s *TaskService) RetrieveTask(ctx context.Context, taskID string) (*task.Task, error) {
 
 	return nil, nil
 }
 
-func (s *TaskService) updateTask(ctx context.Context, taskID string) error {
+// UpdateTask ...
+func (s *TaskService) UpdateTask(ctx context.Context, taskID string) error {
 
 	return nil
 }
 
-func (s *TaskService) deleteTask(ctx context.Context, taskID string) error {
+// DeleteTask ...
+func (s *TaskService) DeleteTask(ctx context.Context, taskID string) error {
 
 	return nil
 }

@@ -1,32 +1,31 @@
-package service
+package router
 
 import (
 	"errors"
 	"fmt"
 	customError "tasks-service/pkg/error"
-	"tasks-service/pkg/task"
 
 	"gopkg.in/go-playground/validator.v9"
 )
 
-// TaskValidator ...
-type TaskValidator struct {
+// RequestValidator ...
+type RequestValidator struct {
 	validate *validator.Validate
 }
 
-// NewTaskValidator ...
-func NewTaskValidator(validate *validator.Validate) *TaskValidator {
+// NewRequestValidator ...
+func NewRequestValidator(validate *validator.Validate) *RequestValidator {
 
-	return &TaskValidator{
+	return &RequestValidator{
 		validate: validate,
 	}
 }
 
-// Validate validates the content of a *task.Task
-//		- returns task.ErrorInvalidTask if not valid, nil if valid and customError.ErrorUnknown if an unexpected problem occurred
-func (v *TaskValidator) Validate(t *task.Task) error {
+// Validate validates the content of a request body content
+//		- returns ErrorBadRequest if not valid, nil if valid and ErrorUnknown if an unexpected problem occurred
+func (v *RequestValidator) Validate(req interface{}) error {
 
-	err := v.validate.Struct(t)
+	err := v.validate.Struct(req)
 	if err != nil {
 
 		var (
@@ -45,7 +44,7 @@ func (v *TaskValidator) Validate(t *task.Task) error {
 				details = append(details, fmt.Sprintf("%s", fieldErr))
 			}
 
-			return customError.NewError(ErrorInvalidTask).WithDetails(details...)
+			return customError.NewError(ErrorBadRequest).WithDetails(details...)
 		}
 
 		return err
