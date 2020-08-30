@@ -19,13 +19,13 @@ type httpServer struct {
 }
 
 // NewHTTPServer ...
-func NewHTTPServer(name, address string, handler *http.Handler) Server {
+func NewHTTPServer(name, address string, handler http.Handler) Server {
 
 	return &httpServer{
 		name:    name,
 		address: address,
 		server: &http.Server{
-			Handler: *handler,
+			Handler: handler,
 			Addr:    address,
 		},
 	}

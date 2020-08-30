@@ -1,6 +1,7 @@
 package router
 
 import (
+	"net/http"
 	"tasks-service/internal/service"
 
 	"github.com/gorilla/mux"
@@ -8,16 +9,18 @@ import (
 
 // Router ...
 type Router struct {
-	service *service.TaskService
-	router  *mux.Router
+	basePath string
+	service  *service.TaskService
+	router   *mux.Router
 }
 
 // New ...
-func New(service *service.TaskService) *Router {
+func New(basePath string, service *service.TaskService) *Router {
 
 	router := &Router{
-		service: service,
-		router:  mux.NewRouter(),
+		basePath: basePath,
+		service:  service,
+		router:   mux.NewRouter(),
 	}
 
 	router.setupRoutes()
@@ -27,4 +30,10 @@ func New(service *service.TaskService) *Router {
 
 func (r *Router) setupRoutes() {
 
+}
+
+// GetHTTPHandler ...
+func (r *Router) GetHTTPHandler() http.Handler {
+
+	return r.router
 }

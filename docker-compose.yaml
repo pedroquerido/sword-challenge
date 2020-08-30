@@ -16,14 +16,16 @@ services:
       dockerfile: Dockerfile
     container_name: tasks-service
     ports:
-      - 8080:8080
+      - "${TASKS_HTTP_PORT}:${TASKS_HTTP_PORT}"
     environment:
-      - DB_DRIVER=${DB_DRIVER}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
+      - DB_DRIVER=${TASKS_DB_DRIVER}
+      - DB_HOST=${MYSQL_HOST}
+      - DB_PORT=${MYSQL_PORT}
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_NAME=${MYSQL_TASKS_DB_NAME}
+      - HTTP_PORT=:${TASKS_HTTP_PORT}
+      - HTTP_PATH=${TASKS_HTTP_PATH}
     restart: on-failure
     volumes:
       - ./:/app
@@ -34,15 +36,15 @@ services:
 
   mysql-sc:
     image: mysql:5.7
-    container_name: mysql-sc
+    container_name: "${MYSQL_HOST}"
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${MYSQL_PORT}:${MYSQL_PORT}"
     environment:
-      - MYSQL_ROOT_HOST=${DB_HOST} 
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_HOST=${MYSQL_HOST} 
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_TASKS_DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - database_mysql:/var/lib/mysql
     networks:

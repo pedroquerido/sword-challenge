@@ -4,7 +4,10 @@ import (
 	"log"
 	"tasks-service/internal/config"
 	"tasks-service/internal/repo/gorm"
+	"tasks-service/internal/router"
 	"tasks-service/internal/service"
+	"tasks-service/pkg/shutdown"
+	"time"
 
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -38,7 +41,14 @@ func (t *TaskAPI) Run() error {
 
 	validate := validator.New()
 
-	service.NewTaskService(taskRepo, validate)
+	service := service.NewTaskService(taskRepo, validate)
+
+	router.New(cfg.HTTP.Path, service)
+
+	//httpServer := server.NewHTTPServer()
+
+	// Shutdown
+	shutdown.NewShutdown(time.Duration(1))
 
 	log.Println("exiting... for now")
 	blockForever()

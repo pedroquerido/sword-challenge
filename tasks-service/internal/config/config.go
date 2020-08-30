@@ -13,7 +13,8 @@ const (
 
 // Values ...
 type Values struct {
-	DB Database
+	DB   Database
+	HTTP HTTP
 }
 
 // Get ...
@@ -22,6 +23,7 @@ func Get() *Values {
 	once.Do(func() {
 
 		instance.DB.load()
+		instance.HTTP.load()
 	})
 
 	return &instance
