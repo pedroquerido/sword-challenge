@@ -1,11 +1,13 @@
 package router
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"tasks-service/internal/router/request"
 	"tasks-service/internal/router/response"
+	"tasks-service/internal/service"
 )
 
 const (
@@ -34,7 +36,11 @@ func (rt *Router) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call Service
-	taskID, err := rt.service.CreateTask(r.Context(), r.Header.Get("x-user-id"), body.Summary, body.Date)
+	serviceContext := service.Context{
+		UserID:   r.Header.Get("x-user-id"),
+		UserRole: r.Header.Get("x-user-role"),
+	}
+	taskID, err := rt.service.CreateTask(context.WithValue(context.Background(), service.ContextKey, serviceContext), body.Summary, body.Date)
 	if err != nil {
 		errResponse := parseError(err)
 		writeJSON(w, errResponse.Code, errResponse)

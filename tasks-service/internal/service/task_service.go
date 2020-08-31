@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"tasks-service/internal/repo"
+	pkgError "tasks-service/pkg/error"
 	"tasks-service/pkg/task"
 	"time"
 
@@ -25,10 +26,14 @@ func NewTaskService(repo repo.TaskRepository, validate *validator.Validate) *Tas
 }
 
 // CreateTask ...
-func (s *TaskService) CreateTask(ctx context.Context, userID, summary string, date time.Time) (string, error) {
+func (s *TaskService) CreateTask(ctx context.Context, summary string, date time.Time) (string, error) {
 
-	task := task.NewTask(userID, summary, date)
+	serviceContext, err := parseContext(ctx)
+	if err != nil {
+		return "", err
+	}
 
+	task := task.NewTask(serviceContext.UserID, summary, date)
 	if err := s.validate.Validate(task); err != nil {
 		return "", err
 	}
@@ -60,4 +65,16 @@ func (s *TaskService) UpdateTask(ctx context.Context, taskID string) error {
 func (s *TaskService) DeleteTask(ctx context.Context, taskID string) error {
 
 	return nil
+}
+
+func parseContext(ctx context.Context) (*Context, error) {
+
+	context := ctx.Value(ContextKey)
+
+	serviceContext, ok := context.(Context)
+	if !ok {
+		return nil, pkgError.NewError(ErrorMissingContext)
+	}
+
+	return &serviceContext, nil
 }

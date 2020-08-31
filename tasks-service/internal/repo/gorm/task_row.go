@@ -9,18 +9,20 @@ import (
 )
 
 type taskRow struct {
-	ID        uint64    `gorm:"colummn:id;primary_key;auto_increment" json:"-"`
-	TaskID    string    `gorm:"colummn:task_id;not null; unique;" json:"id"`
-	Summary   string    `gorm:"collumn:summary;size:2500;not null;" json:"summary"`
-	Date      time.Time `gorm:"collumn:date;not null" json:"date"`
-	CreatedAt time.Time `gorm:"collumn:created_at" json:"created_at"`
-	UpdatedAt time.Time `gorm:"collumn:updated_at" json:"updated_at"`
+	ID        uint64    `gorm:"colummn:id;primary_key;auto_increment"`
+	TaskID    string    `gorm:"colummn:task_id;not null; unique;"`
+	UserID    string    `gorm:"collumn:user_id;not null;"`
+	Summary   string    `gorm:"collumn:summary;size:2500;not null;"`
+	Date      time.Time `gorm:"collumn:date;not null"`
+	CreatedAt time.Time `gorm:"collumn:created_at"`
+	UpdatedAt time.Time `gorm:"collumn:updated_at"`
 }
 
 func fromTask(task *task.Task) *taskRow {
 
 	return &taskRow{
 		TaskID:  task.ID,
+		UserID:  task.UserID,
 		Summary: task.Summary,
 		Date:    task.Date,
 	}
@@ -30,6 +32,7 @@ func (r *taskRow) toTask() *task.Task {
 
 	return &task.Task{
 		ID:      r.TaskID,
+		UserID:  r.UserID,
 		Summary: r.Summary,
 		Date:    r.Date,
 	}

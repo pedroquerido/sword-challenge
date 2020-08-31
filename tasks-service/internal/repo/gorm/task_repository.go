@@ -104,18 +104,36 @@ func (r *TaskRepository) Find(id string) (*task.Task, error) {
 }
 
 // List ...
-func (r *TaskRepository) List() ([]*task.Task, error) {
+func (r *TaskRepository) List(limit *int, offset *int64, userID *string) (tasks []*task.Task, count int64, err error) {
 
-	rows := []taskRow{}
+	rows := []*taskRow{}
 
-	if err := r.db.Debug().Find(&rows).Error; err != nil {
-		return nil, err
+	query := r.db
+	countQuery := r.db.Model(&taskRow{})
+
+	if userID != nil {
+		query = query.Where("user_id = ?", *userID)
+		countQuery = countQuery.Where("user_id = ?", *userID)
 	}
 
-	tasks := make([]*task.Task, 0, len(rows))
+	if limit != nil {
+		query = query.Limit(*limit)
+	}
+
+	if offset != nil {
+		query = query.Offset(int(*offset))
+	}
+
+	if err = query.Find(&rows).Error; err != nil {
+		return nil, 0, err
+	}
+
+	tasks = make([]*task.Task, 0, len(rows))
 	for _, row := range rows {
 		tasks = append(tasks, row.toTask())
 	}
 
-	return tasks, nil
+	countQuery.Count(&count)
+
+	return tasks, count, nil
 }
