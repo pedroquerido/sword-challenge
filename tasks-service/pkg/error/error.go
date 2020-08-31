@@ -1,5 +1,9 @@
 package error
 
+import (
+	"fmt"
+)
+
 // Error represents a structure and set methods for better error handling
 type Error struct {
 	error
@@ -17,7 +21,7 @@ func NewError(err error) Error {
 // Error returns error string representation
 func (c Error) Error() string {
 
-	return c.error.Error()
+	return fmt.Sprintf("%s: %v", c.error.Error(), c.details)
 }
 
 // Unwrap returns underlying wrapped error

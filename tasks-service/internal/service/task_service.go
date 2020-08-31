@@ -9,6 +9,8 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+var _ TaskService = (*taskService)(nil)
+
 // TaskService represents the Use Case layer containing application specific business rules
 type TaskService interface {
 	Create(ctx context.Context, summary string, date time.Time) (string, error)

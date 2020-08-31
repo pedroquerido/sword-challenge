@@ -3,6 +3,7 @@ package gorm
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"tasks-service/internal/repo"
 	pkgError "tasks-service/pkg/error"
@@ -70,8 +71,8 @@ func NewTaskRepository(options *TaskRepositoryOptions) (*TaskRepository, error) 
 	}, nil
 }
 
-// Save ...
-func (r *TaskRepository) Save(task *task.Task) error {
+// Insert ...
+func (r *TaskRepository) Insert(task *task.Task) error {
 
 	row := fromTask(task)
 
@@ -94,7 +95,7 @@ func (r *TaskRepository) Find(id string) (*task.Task, error) {
 
 	if err := r.db.Where("task_id = ?", id).Take(&row).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, pkgError.NewError(repo.ErrorNotFound).WithDetails(err.Error())
+			return nil, pkgError.NewError(repo.ErrorNotFound)
 		}
 
 		return nil, err
@@ -136,4 +137,48 @@ func (r *TaskRepository) Search(limit *int, offset *int64, userID *string) (task
 	countQuery.Count(&count)
 
 	return tasks, count, nil
+}
+
+// Update ...
+func (r *TaskRepository) Update(id string, summary *string, date *time.Time) error {
+
+	if summary == nil && date == nil {
+		return nil
+	}
+
+	updateMap := make(map[string]interface{})
+
+	if summary != nil {
+		updateMap["summary"] = *summary
+	}
+
+	if date != nil {
+		updateMap["date"] = *date
+	}
+
+	if err := r.db.Model(&taskRow{}).Where("task_id = ?", id).Updates(updateMap).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return pkgError.NewError(repo.ErrorNotFound)
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+// Delete ...
+func (r *TaskRepository) Delete(id string) error {
+
+	if err := r.db.Where("task_id = ?", id).Delete(&taskRow{}).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return pkgError.NewError(repo.ErrorNotFound)
+		}
+
+		return err
+	}
+
+	return nil
 }
