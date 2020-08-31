@@ -103,8 +103,8 @@ func (r *TaskRepository) Find(id string) (*task.Task, error) {
 	return row.toTask(), nil
 }
 
-// List ...
-func (r *TaskRepository) List(limit *int, offset *int64, userID *string) (tasks []*task.Task, count int64, err error) {
+// Search ...
+func (r *TaskRepository) Search(limit *int, offset *int64, userID *string) (tasks []*task.Task, count int64, err error) {
 
 	rows := []*taskRow{}
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"tasks-service/internal/router/response"
 	"tasks-service/internal/service"
-	customError "tasks-service/pkg/error"
+	pkgError "tasks-service/pkg/error"
 )
 
 const (
@@ -28,7 +28,7 @@ func parseError(err error) *response.ErrorResponse {
 	if err != nil {
 
 		var (
-			structuredError customError.Error
+			structuredError pkgError.Error
 		)
 
 		if errors.As(err, &structuredError) {

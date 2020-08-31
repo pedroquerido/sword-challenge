@@ -26,13 +26,13 @@ func (c Error) Unwrap() error {
 	return c.error
 }
 
-// AddDetails adds context to error
-func (c Error) AddDetails(details ...string) {
+// SetDetails sets context to error
+func (c Error) SetDetails(details ...string) {
 
 	c.details = details
 }
 
-// WithDetails adds context to error and is to be used in chain
+// WithDetails sets context to error and is to be used in chain
 func (c Error) WithDetails(details ...string) Error {
 
 	c.details = details

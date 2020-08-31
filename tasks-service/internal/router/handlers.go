@@ -40,7 +40,7 @@ func (rt *Router) createTask(w http.ResponseWriter, r *http.Request) {
 		UserID:   r.Header.Get("x-user-id"),
 		UserRole: r.Header.Get("x-user-role"),
 	}
-	taskID, err := rt.service.CreateTask(context.WithValue(context.Background(), service.ContextKey, serviceContext), body.Summary, body.Date)
+	taskID, err := rt.service.Create(context.WithValue(context.Background(), service.ContextKey, serviceContext), body.Summary, body.Date)
 	if err != nil {
 		errResponse := parseError(err)
 		writeJSON(w, errResponse.Code, errResponse)

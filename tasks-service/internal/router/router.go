@@ -22,13 +22,13 @@ const (
 // Router ...
 type Router struct {
 	basePath string
-	service  *service.TaskService
+	service  service.TaskService
 	router   *mux.Router
 	validate *RequestValidator
 }
 
 // New ...
-func New(basePath string, service *service.TaskService, validate *validator.Validate) *Router {
+func New(basePath string, service service.TaskService, validate *validator.Validate) *Router {
 
 	router := &Router{
 		basePath: basePath,

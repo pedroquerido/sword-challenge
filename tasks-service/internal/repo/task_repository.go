@@ -8,5 +8,5 @@ import (
 type TaskRepository interface {
 	Save(task *task.Task) error
 	Find(id string) (*task.Task, error)
-	List(limit *int, offset *int64, userID *string) (tasks []*task.Task, count int64, err error)
+	Search(limit *int, offset *int64, userID *string) (tasks []*task.Task, count int64, err error)
 }
