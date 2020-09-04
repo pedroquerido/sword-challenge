@@ -2,13 +2,14 @@ package service
 
 import (
 	"context"
+
 	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
 )
 
 const (
-	detailParsingContext  = "could not parse"
-	detailMissingUserID   = "missing UserID"
-	detailMissingUserRole = "missing UserRole"
+	detailParsingContext   = "could not parse"
+	detailMissingUserID    = "missing UserID"
+	detailMissingIsManager = "missing IsManager"
 )
 
 var (
@@ -20,8 +21,8 @@ type contextKey string
 
 // Context represents the context structure to be used at the service package
 type Context struct {
-	UserID   string
-	UserRole string
+	UserID    string
+	IsManager *bool
 }
 
 func parseContext(ctx context.Context) (*Context, error) {
@@ -40,8 +41,8 @@ func parseContext(ctx context.Context) (*Context, error) {
 		details = append(details, detailMissingUserID)
 	}
 
-	if serviceContext.UserRole == "" {
-		details = append(details, detailMissingUserRole)
+	if serviceContext.IsManager == nil {
+		details = append(details, detailMissingIsManager)
 	}
 
 	if len(details) > 0 {

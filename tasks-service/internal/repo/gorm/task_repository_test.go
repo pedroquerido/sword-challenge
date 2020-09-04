@@ -177,13 +177,13 @@ func TestTaskRepository_Update(t *testing.T) {
 		assert.Equal(t, updateSummary, task.Summary)
 		// assert.Equal(t, updateDate, task.Date) // TODO: comeback to this
 	})
-	t.Run("should return err not found", func(t *testing.T) {
+	t.Run("should return err not found with nonexisting task", func(t *testing.T) {
 
 		err := testRepo.Update(notFoundTaskID, testTaskUserID, &updateSummary, &updateDate)
 		assert.NotNil(t, err)
 		assert.True(t, errors.Is(err, repo.ErrorNotFound))
 	})
-	t.Run("should return err not found", func(t *testing.T) {
+	t.Run("should return err not found with task from other user", func(t *testing.T) {
 
 		err := testRepo.Update(testTaskID, notFoundUserID, &updateSummary, &updateDate)
 		assert.NotNil(t, err)
