@@ -3,13 +3,13 @@ package gorm
 import (
 	"time"
 
-	"tasks-service/pkg/task"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 
 	"gorm.io/gorm"
 )
 
 type taskRow struct {
-	ID        uint64    `gorm:"colummn:id;primary_key;auto_increment"`
+	ID        uint64    `gorm:"colummn:id;primary_key;auto_increment;"`
 	TaskID    string    `gorm:"colummn:task_id;not null; unique;"`
 	UserID    string    `gorm:"collumn:user_id;not null;"`
 	Summary   string    `gorm:"collumn:summary;size:2500;not null;"`
@@ -19,6 +19,10 @@ type taskRow struct {
 }
 
 func fromTask(task *task.Task) *taskRow {
+
+	if task == nil {
+		return &taskRow{}
+	}
 
 	return &taskRow{
 		TaskID:  task.ID,
@@ -38,16 +42,20 @@ func (r *taskRow) toTask() *task.Task {
 	}
 }
 
+func (r *taskRow) TableName() string {
+	return "tasks"
+}
+
 func (r *taskRow) BeforeCreate(tx *gorm.DB) (err error) {
 
-	r.CreatedAt = time.Now().UTC()
+	r.CreatedAt = time.Now()
 
 	return nil
 }
 
 func (r *taskRow) BeforeUpdate(tx *gorm.DB) (err error) {
 
-	r.UpdatedAt = time.Now().UTC()
+	r.UpdatedAt = time.Now()
 
 	return nil
 }

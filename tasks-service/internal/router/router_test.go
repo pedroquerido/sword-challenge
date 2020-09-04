@@ -2,7 +2,7 @@ package router_test
 
 import (
 	"os"
-	"tasks-service/internal/router"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router"
 	"testing"
 
 	"gopkg.in/go-playground/validator.v9"

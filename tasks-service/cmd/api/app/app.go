@@ -1,16 +1,27 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
-	"tasks-service/internal/config"
-	"tasks-service/internal/repo/gorm"
-	"tasks-service/internal/router"
-	"tasks-service/internal/service"
-	"tasks-service/pkg/server"
+
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/config"
+	repoGorm "github.com/pedroquerido/sword-challenge/tasks-service/internal/repo/gorm"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/server"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 
 	"gopkg.in/go-playground/validator.v9"
+)
+
+const (
+	mySQL              = "mysql"
+	mySQLConnectionURL = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
+
+	dbConnectionError = "error connecting to db: %w"
 )
 
 // TaskAPI ...
@@ -31,19 +42,14 @@ func (t *TaskAPI) Run() error {
 	// Load configs
 	cfg := config.Get()
 
-	// Setup repo
-	taskRepo, err := gorm.NewTaskRepository(&gorm.TaskRepositoryOptions{
-		Driver:   cfg.DB.Driver,
-		Host:     cfg.DB.Host,
-		Port:     cfg.DB.Port,
-		User:     cfg.DB.User,
-		Password: cfg.DB.Password,
-		Name:     cfg.DB.Name,
-		Migrate:  t.migrateDB,
-	})
+	// Connect to db
+	db, err := connectToDB(cfg.DB)
 	if err != nil {
 		return err
 	}
+
+	// Setup repo
+	taskRepo := repoGorm.NewTaskRepository(db)
 
 	// Create validator
 	validate := validator.New()
@@ -63,6 +69,23 @@ func (t *TaskAPI) Run() error {
 	httpServer.Stop()
 
 	return nil
+}
+
+func connectToDB(cfg config.Database) (db *gorm.DB, err error) {
+
+	switch cfg.Driver {
+	case mySQL:
+		url := fmt.Sprintf(mySQLConnectionURL, cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name)
+		db, err = gorm.Open(mysql.Open(url), &gorm.Config{})
+	default:
+		err = fmt.Errorf("unknown driver %s", cfg.Driver)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf(dbConnectionError, err)
+	}
+
+	return db, nil
 }
 
 func waitForSignal() {

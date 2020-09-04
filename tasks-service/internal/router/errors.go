@@ -4,9 +4,9 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"tasks-service/internal/router/response"
-	"tasks-service/internal/service"
-	pkgError "tasks-service/pkg/error"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/response"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
+	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
 )
 
 const (

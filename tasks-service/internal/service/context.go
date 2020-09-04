@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	pkgError "tasks-service/pkg/error"
+	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
 )
 
 const (

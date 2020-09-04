@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"tasks-service/internal/router/request"
-	"tasks-service/internal/router/response"
-	"tasks-service/internal/service"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/request"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/response"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
 )
 
 const (

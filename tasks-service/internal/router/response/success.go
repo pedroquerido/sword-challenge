@@ -1,7 +1,7 @@
 package response
 
 import (
-	"tasks-service/pkg/task"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 )
 
 // CreateTaskResponse ..

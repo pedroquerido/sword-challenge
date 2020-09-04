@@ -3,7 +3,7 @@ package router
 import (
 	"errors"
 	"fmt"
-	customError "tasks-service/pkg/error"
+	customError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
 
 	"gopkg.in/go-playground/validator.v9"
 )

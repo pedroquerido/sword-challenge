@@ -4,12 +4,12 @@ FROM golang:1.15 as builder
 # Maintainer
 LABEL maintainer="Pedro Querido <pedroquerido14@gmail.com>"
 
-RUN mkdir /app
+RUN mkdir -p /github.com/pedroquerido/sword-challenge/tasks-service
 
-ADD . /app
+ADD . /github.com/pedroquerido/sword-challenge/tasks-service
 
-WORKDIR /app
+WORKDIR /github.com/pedroquerido/sword-challenge/tasks-service
 
 RUN go mod download
 
-CMD CGO_ENABLED=0 go test -v  ./...
+CMD CGO_ENABLED=0 go test -v -cover ./...

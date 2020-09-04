@@ -2,9 +2,9 @@ package service_test
 
 import (
 	"errors"
-	"tasks-service/internal/service"
-	"tasks-service/pkg/rand"
-	"tasks-service/pkg/task"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/rand"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 	"testing"
 	"time"
 )

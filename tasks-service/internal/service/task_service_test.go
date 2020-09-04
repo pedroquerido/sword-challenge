@@ -2,7 +2,7 @@ package service_test
 
 import (
 	"os"
-	"tasks-service/internal/service"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
 	"testing"
 
 	"gopkg.in/go-playground/validator.v9"

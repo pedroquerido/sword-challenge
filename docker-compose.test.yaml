@@ -1,0 +1,50 @@
+version: "3.8"
+
+volumes:
+  sc-volume_test:
+  database_mysql_test:
+    
+networks:
+  sc-network_test:
+    driver: bridge
+
+services:
+  tasks-service_test:
+    build:
+      context: ./tasks-service
+      dockerfile: Dockerfile.test
+    container_name: tasks-service_test
+    ports:
+      - "${TASKS_HTTP_PORT}:${TASKS_HTTP_PORT}"
+    environment:
+      - DB_DRIVER=${TASKS_DB_DRIVER}
+      - DB_HOST=${MYSQL_TEST_HOST}
+      - DB_PORT=${MYSQL_TEST_PORT}
+      - DB_USER=${MYSQL_TEST_USER}
+      - DB_PASSWORD=${MYSQL_TEST_PASSWORD}
+      - DB_NAME=${MYSQL_TEST_TASKS_DB_NAME}
+      - HTTP_PORT=:${TASKS_HTTP_PORT}
+      - HTTP_PATH=/${TASKS_HTTP_PATH}
+    restart: on-failure
+    volumes:
+      - ./:/app
+    depends_on:
+      - mysql-sc_test
+    networks:
+      - sc-network_test
+
+  mysql-sc_test:
+    image: mysql:5.7
+    container_name: "${MYSQL_TEST_HOST}"
+    ports:
+      - "${MYSQL_TEST_PORT}:${MYSQL_TEST_PORT}"
+    environment:
+      - MYSQL_ROOT_HOST=${MYSQL_TEST_HOST} 
+      - MYSQL_USER=${MYSQL_TEST_USER}
+      - MYSQL_PASSWORD=${MYSQL_TEST_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_TEST_TASKS_DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_TEST_PASSWORD}
+    volumes:
+      - database_mysql_test:/var/lib/mysql
+    networks:
+      - sc-network_test

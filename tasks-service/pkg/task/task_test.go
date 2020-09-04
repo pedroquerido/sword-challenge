@@ -1,8 +1,8 @@
 package task_test
 
 import (
-	"tasks-service/pkg/rand"
-	"tasks-service/pkg/task"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/rand"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 	"testing"
 	"time"
 

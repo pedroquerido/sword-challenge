@@ -2,7 +2,7 @@ package response_test
 
 import (
 	"reflect"
-	"tasks-service/internal/router/response"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/response"
 	"testing"
 )
 

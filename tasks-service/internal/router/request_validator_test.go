@@ -2,8 +2,8 @@ package router_test
 
 import (
 	"errors"
-	"tasks-service/internal/router"
-	"tasks-service/internal/router/request"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/request"
 	"testing"
 	"time"
 )

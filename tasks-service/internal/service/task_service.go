@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"tasks-service/internal/repo"
-	"tasks-service/pkg/task"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 	"time"
 
 	"gopkg.in/go-playground/validator.v9"

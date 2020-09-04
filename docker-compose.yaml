@@ -2,12 +2,11 @@ version: "3.8"
 
 volumes:
   sc-volume:
-    name: sc-volume
   database_mysql:
     
 networks:
   sc-network:
-    name: sc-network
+    driver: bridge
 
 services:
   tasks-service:

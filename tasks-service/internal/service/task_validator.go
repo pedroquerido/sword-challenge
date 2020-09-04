@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 	"fmt"
-	customError "tasks-service/pkg/error"
-	"tasks-service/pkg/task"
+	customError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 
 	"gopkg.in/go-playground/validator.v9"
 )

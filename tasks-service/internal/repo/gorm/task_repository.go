@@ -2,25 +2,19 @@ package gorm
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
-	"tasks-service/internal/repo"
-	pkgError "tasks-service/pkg/error"
-	"tasks-service/pkg/task"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
+	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var _ repo.TaskRepository = (*TaskRepository)(nil)
 
 const (
-	mySQL              = "mysql"
-	mySQLConnectionURL = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
-
-	connectionError = "error connecting to db: %w"
-	migrationError  = "error migrating db: %w"
+	migrationError = "error migrating db: %w"
 )
 
 // TaskRepository ...
@@ -28,47 +22,12 @@ type TaskRepository struct {
 	db *gorm.DB
 }
 
-// TaskRepositoryOptions ...
-type TaskRepositoryOptions struct {
-	Driver   string
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Name     string
-	Migrate  bool
-}
-
 // NewTaskRepository ...
-func NewTaskRepository(options *TaskRepositoryOptions) (*TaskRepository, error) {
-
-	var (
-		err error
-		db  *gorm.DB
-	)
-
-	switch options.Driver {
-	case mySQL:
-		url := fmt.Sprintf(mySQLConnectionURL, options.User, options.Password, options.Host, options.Port, options.Name)
-		db, err = gorm.Open(mysql.Open(url), &gorm.Config{})
-
-	default:
-		err = fmt.Errorf("unknown driver %s", options.Driver)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf(connectionError, err)
-	}
-
-	if options.Migrate {
-		if err := db.AutoMigrate(&taskRow{}); err != nil {
-			return nil, fmt.Errorf(migrationError, err)
-		}
-	}
+func NewTaskRepository(db *gorm.DB) *TaskRepository {
 
 	return &TaskRepository{
 		db: db,
-	}, nil
+	}
 }
 
 // Insert ...
@@ -77,11 +36,6 @@ func (r *TaskRepository) Insert(task *task.Task) error {
 	row := fromTask(task)
 
 	if err := r.db.Create(&row).Error; err != nil {
-
-		if errors.Is(err, gorm.ErrInvalidField) {
-			return pkgError.NewError(repo.ErrorInvalidSave).WithDetails(err.Error())
-		}
-
 		return err
 	}
 
@@ -105,28 +59,18 @@ func (r *TaskRepository) Find(id string) (*task.Task, error) {
 }
 
 // Search ...
-func (r *TaskRepository) Search(limit *int, offset *int64, userID *string) (tasks []*task.Task, count int64, err error) {
+func (r *TaskRepository) Search(userID *string) (tasks []*task.Task, err error) {
 
 	rows := []*taskRow{}
 
 	query := r.db
-	countQuery := r.db.Model(&taskRow{})
 
 	if userID != nil {
 		query = query.Where("user_id = ?", *userID)
-		countQuery = countQuery.Where("user_id = ?", *userID)
-	}
-
-	if limit != nil {
-		query = query.Limit(*limit)
-	}
-
-	if offset != nil {
-		query = query.Offset(int(*offset))
 	}
 
 	if err = query.Find(&rows).Error; err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	tasks = make([]*task.Task, 0, len(rows))
@@ -134,9 +78,7 @@ func (r *TaskRepository) Search(limit *int, offset *int64, userID *string) (task
 		tasks = append(tasks, row.toTask())
 	}
 
-	countQuery.Count(&count)
-
-	return tasks, count, nil
+	return tasks, nil
 }
 
 // Update ...
@@ -156,13 +98,16 @@ func (r *TaskRepository) Update(id string, summary *string, date *time.Time) err
 		updateMap["date"] = *date
 	}
 
-	if err := r.db.Model(&taskRow{}).Where("task_id = ?", id).Updates(updateMap).Error; err != nil {
+	tx := r.db.Model(&taskRow{}).Where("task_id = ?", id).Updates(updateMap)
 
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return pkgError.NewError(repo.ErrorNotFound)
-		}
+	if tx.Error != nil {
 
-		return err
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+
+		return pkgError.NewError(repo.ErrorNotFound)
 	}
 
 	return nil
@@ -171,13 +116,16 @@ func (r *TaskRepository) Update(id string, summary *string, date *time.Time) err
 // Delete ...
 func (r *TaskRepository) Delete(id string) error {
 
-	if err := r.db.Where("task_id = ?", id).Delete(&taskRow{}).Error; err != nil {
+	tx := r.db.Where("task_id = ?", id).Delete(&taskRow{})
 
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return pkgError.NewError(repo.ErrorNotFound)
-		}
+	if tx.Error != nil {
 
-		return err
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+
+		return pkgError.NewError(repo.ErrorNotFound)
 	}
 
 	return nil

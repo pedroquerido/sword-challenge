@@ -2,7 +2,7 @@ package router
 
 import (
 	"net/http"
-	"tasks-service/internal/service"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/go-playground/validator.v9"

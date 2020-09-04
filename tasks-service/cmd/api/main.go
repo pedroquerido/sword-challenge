@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"tasks-service/cmd/api/app"
+	"github.com/pedroquerido/sword-challenge/tasks-service/cmd/api/app"
 )
 
 var (
