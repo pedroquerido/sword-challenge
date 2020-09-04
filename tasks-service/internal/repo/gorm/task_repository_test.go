@@ -161,13 +161,15 @@ func TestTaskRepository_Find(t *testing.T) {
 func TestTaskRepository_Update(t *testing.T) {
 
 	testTaskID := "9b150634-0fef-4913-b80e-29e5f3bbafec"
+	testTaskUserID := "user-test"
 	updateSummary := "summary-0"
 	updateDate := time.Now()
 	notFoundTaskID := "b13c663c-40cf-4856-bc88-45818c1439ee"
+	notFoundUserID := "test-user"
 
 	t.Run("should update summary and date on task with task id", func(t *testing.T) {
 
-		err := testRepo.Update(testTaskID, &updateSummary, &updateDate)
+		err := testRepo.Update(testTaskID, testTaskUserID, &updateSummary, &updateDate)
 		assert.Nil(t, err)
 
 		task, err := testRepo.Find(testTaskID)
@@ -177,7 +179,13 @@ func TestTaskRepository_Update(t *testing.T) {
 	})
 	t.Run("should return err not found", func(t *testing.T) {
 
-		err := testRepo.Update(notFoundTaskID, &updateSummary, &updateDate)
+		err := testRepo.Update(notFoundTaskID, testTaskUserID, &updateSummary, &updateDate)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, repo.ErrorNotFound))
+	})
+	t.Run("should return err not found", func(t *testing.T) {
+
+		err := testRepo.Update(testTaskID, notFoundUserID, &updateSummary, &updateDate)
 		assert.NotNil(t, err)
 		assert.True(t, errors.Is(err, repo.ErrorNotFound))
 	})
