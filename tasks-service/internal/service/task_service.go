@@ -8,8 +8,6 @@ import (
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
 	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
-
-	"gopkg.in/go-playground/validator.v9"
 )
 
 var _ TaskService = (*taskService)(nil)
@@ -24,16 +22,16 @@ type TaskService interface {
 }
 
 type taskService struct {
-	repo     repo.TaskRepository
-	validate *TaskValidator
+	repo      repo.TaskRepository
+	validator TaskValidator
 }
 
 // NewTaskService initializes and returns a new taskService implementation of TaskService
-func NewTaskService(repo repo.TaskRepository, validate *validator.Validate) TaskService {
+func NewTaskService(repo repo.TaskRepository, validator TaskValidator) TaskService {
 
 	return &taskService{
-		repo:     repo,
-		validate: NewTaskValidator(validate),
+		repo:      repo,
+		validator: validator,
 	}
 }
 
@@ -46,7 +44,7 @@ func (s *taskService) Create(ctx context.Context, summary string, date time.Time
 	}
 
 	task := task.NewTask(serviceContext.UserID, summary, date)
-	if err := s.validate.Validate(task); err != nil {
+	if err := s.validator.Validate(task); err != nil {
 		return "", err
 	}
 
@@ -127,7 +125,7 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 		task.Date = *date
 	}
 
-	if err := s.validate.Validate(task); err != nil {
+	if err := s.validator.Validate(task); err != nil {
 		return err
 	}
 

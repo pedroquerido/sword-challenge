@@ -82,7 +82,7 @@ func (r *TaskRepository) Search(userID *string) (tasks []*task.Task, err error) 
 }
 
 // Update ...
-func (r *TaskRepository) Update(id, userID string, summary *string, date *time.Time) error {
+func (r *TaskRepository) Update(id string, summary *string, date *time.Time) error {
 
 	if summary == nil && date == nil {
 		return nil
@@ -98,7 +98,7 @@ func (r *TaskRepository) Update(id, userID string, summary *string, date *time.T
 		updateMap["date"] = *date
 	}
 
-	tx := r.db.Model(&taskRow{}).Where("task_id = ? AND user_id = ?", id, userID).Updates(updateMap)
+	tx := r.db.Model(&taskRow{}).Where("task_id = ?", id).Updates(updateMap)
 
 	if tx.Error != nil {
 

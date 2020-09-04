@@ -35,7 +35,7 @@ func parseContext(ctx context.Context) (*Context, error) {
 		return nil, pkgError.NewError(ErrorMissingContext).WithDetails(detailParsingContext)
 	}
 
-	// Validate designed required fields - could later use validator as well
+	// Validate designed required fields - could later use *validator.Validate as well
 	details := make([]string, 0, 2)
 	if serviceContext.UserID == "" {
 		details = append(details, detailMissingUserID)

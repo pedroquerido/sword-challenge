@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+
 	customError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 
@@ -10,21 +11,25 @@ import (
 )
 
 // TaskValidator ...
-type TaskValidator struct {
+type TaskValidator interface {
+	// Validate validates the content of a *task.Task - returns ErrorInvalidTask if not valid, nil if valid
+	Validate(t *task.Task) error
+}
+
+type taskValidator struct {
 	validate *validator.Validate
 }
 
 // NewTaskValidator ...
-func NewTaskValidator(validate *validator.Validate) *TaskValidator {
+func NewTaskValidator(validate *validator.Validate) TaskValidator {
 
-	return &TaskValidator{
+	return &taskValidator{
 		validate: validate,
 	}
 }
 
-// Validate validates the content of a *task.Task
-//		- returns task.ErrorInvalidTask if not valid, nil if valid and customError.ErrorUnknown if an unexpected problem occurred
-func (v *TaskValidator) Validate(t *task.Task) error {
+// Validate ...
+func (v *taskValidator) Validate(t *task.Task) error {
 
 	err := v.validate.Struct(t)
 	if err != nil {

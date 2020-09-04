@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/request"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/response"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
@@ -36,9 +37,14 @@ func (rt *Router) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call Service
+	isManager := false
+	if r.Header.Get("x-user-role") == headerUserRoleValueManager {
+		isManager = true
+	}
+
 	serviceContext := service.Context{
-		UserID:   r.Header.Get("x-user-id"),
-		UserRole: r.Header.Get("x-user-role"),
+		UserID:    r.Header.Get("x-user-id"),
+		IsManager: &isManager,
 	}
 	taskID, err := rt.service.Create(context.WithValue(context.Background(), service.ContextKey, serviceContext), body.Summary, body.Date)
 	if err != nil {

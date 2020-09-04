@@ -2,189 +2,167 @@ package service_test
 
 import (
 	"errors"
-	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
-	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/rand"
-	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 	"testing"
 	"time"
+
+	"math/rand"
+
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 const (
-	defaultUUID    = "21aaa98b-842c-484a-a925-79aef811e68d"
-	failureBadUUID = "21AAA98B-842C-484A-A925-79AEF811E68D"
-	failureNoUUID  = "no-uuid"
-
-	defaultUserID = "user_id"
-
-	defaultSummaryLength = 10
-	failureSummaryLength = 2501
-
-	failedTemplate  = "FAILED - expected %v but got %v\n"
-	successTemplate = "PASSED - expected %v and got %v\n"
+	testCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 var (
-	testTaskValidator *service.TaskValidator
-
-	defaultDate time.Time = time.Now()
+	testStringlength = 10
 )
 
-func TestValidateTaskCorrectTask(t *testing.T) {
+func generateRandomString(t *testing.T) string {
+	t.Helper()
 
-	testTask := &task.Task{
-		ID:      defaultUUID,
-		UserID:  defaultUserID,
-		Summary: rand.String(defaultSummaryLength),
-		Date:    defaultDate,
-	}
-	err := testTaskValidator.Validate(testTask)
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	if err != nil {
-		t.Errorf(failedTemplate, nil, err)
-	} else {
-		t.Logf(successTemplate, nil, err)
+	b := make([]byte, testStringlength)
+	for i := range b {
+		b[i] = testCharset[seededRand.Intn(len(testCharset))]
 	}
+
+	return string(b)
 }
 
-func TestValidateTaskEmptyTask(t *testing.T) {
+func TestTaskValidator_Validate(t *testing.T) {
 
-	testTask := &task.Task{}
-	expectedResult := service.ErrorInvalidTask
+	testTaskValidator := service.NewTaskValidator(validator.New())
 
-	err := testTaskValidator.Validate(testTask)
+	t.Run("should return no error", func(t *testing.T) {
 
-	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
-		t.Logf(successTemplate, expectedResult, err)
-	} else {
-		t.Errorf(failedTemplate, expectedResult, err)
-	}
-}
+		testTask := &task.Task{
+			ID:      "21aaa98b-842c-484a-a925-79aef811e68d",
+			UserID:  "user_id",
+			Summary: generateRandomString(t),
+			Date:    time.Now(),
+		}
 
-func TestValidateTaskEmptyID(t *testing.T) {
+		err := testTaskValidator.Validate(testTask)
+		assert.Nil(t, err)
+	})
+	t.Run("should return error invalid task - empty task", func(t *testing.T) {
 
-	testTask := &task.Task{
-		UserID:  defaultUserID,
-		Summary: rand.String(defaultSummaryLength),
-		Date:    defaultDate,
-	}
-	expectedResult := service.ErrorInvalidTask
+		testTask := &task.Task{}
 
-	err := testTaskValidator.Validate(testTask)
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
+	t.Run("should return error invalid task - empty task_id", func(t *testing.T) {
 
-	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
-		t.Logf(successTemplate, expectedResult, err)
-	} else {
-		t.Errorf(failedTemplate, expectedResult, err)
-	}
-}
+		testTask := &task.Task{
+			UserID:  "user_id",
+			Summary: generateRandomString(t),
+			Date:    time.Now(),
+		}
 
-func TestValidateTaskIDNoUUID(t *testing.T) {
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
+	t.Run("should return error invalid task - empty task_id", func(t *testing.T) {
 
-	testTask := &task.Task{
-		ID:      failureNoUUID,
-		UserID:  defaultUserID,
-		Summary: rand.String(defaultSummaryLength),
-		Date:    defaultDate,
-	}
-	expectedResult := service.ErrorInvalidTask
+		testTask := &task.Task{
+			UserID:  "user_id",
+			Summary: generateRandomString(t),
+			Date:    time.Now(),
+		}
 
-	err := testTaskValidator.Validate(testTask)
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
+	t.Run("should return error invalid task - task_id not uuid", func(t *testing.T) {
 
-	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
-		t.Logf(successTemplate, expectedResult, err)
-	} else {
-		t.Errorf(failedTemplate, expectedResult, err)
-	}
-}
+		testTask := &task.Task{
+			ID:      "task_id",
+			UserID:  "user_id",
+			Summary: generateRandomString(t),
+			Date:    time.Now(),
+		}
 
-func TestValidateTaskIDBadUUID(t *testing.T) {
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
+	t.Run("should return error invalid task - task_id invalid uuid", func(t *testing.T) {
 
-	testTask := &task.Task{
-		ID:      failureBadUUID,
-		UserID:  defaultUserID,
-		Summary: rand.String(defaultSummaryLength),
-		Date:    defaultDate,
-	}
-	expectedResult := service.ErrorInvalidTask
+		testTask := &task.Task{
+			ID:      "21aaa98b-842c-484a-a925-79aef811e68D",
+			UserID:  "user_id",
+			Summary: generateRandomString(t),
+			Date:    time.Now(),
+		}
 
-	err := testTaskValidator.Validate(testTask)
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
+	t.Run("should return error invalid task - empty user_id", func(t *testing.T) {
 
-	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
-		t.Logf(successTemplate, expectedResult, err)
-	} else {
-		t.Errorf(failedTemplate, expectedResult, err)
-	}
-}
+		testTask := &task.Task{
+			ID:      "21aaa98b-842c-484a-a925-79aef811e68d",
+			Summary: generateRandomString(t),
+			Date:    time.Now(),
+		}
 
-func TestValidateTaskEmptyUserID(t *testing.T) {
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
+	t.Run("should return error invalid task - empty summary", func(t *testing.T) {
 
-	testTask := &task.Task{
-		ID:      defaultUUID,
-		Summary: rand.String(defaultSummaryLength),
-		Date:    defaultDate,
-	}
-	expectedResult := service.ErrorInvalidTask
+		testStringlength = 2501
 
-	err := testTaskValidator.Validate(testTask)
+		testTask := &task.Task{
+			ID:     "21aaa98b-842c-484a-a925-79aef811e68d",
+			UserID: "user_id",
+			Date:   time.Now(),
+		}
 
-	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
-		t.Logf(successTemplate, expectedResult, err)
-	} else {
-		t.Errorf(failedTemplate, expectedResult, err)
-	}
-}
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
+	t.Run("should return error invalid task - summary too long", func(t *testing.T) {
 
-func TestValidateTaskEmptySummary(t *testing.T) {
+		testStringlength = 2501
 
-	testTask := &task.Task{
-		ID:     defaultUUID,
-		UserID: defaultUserID,
-		Date:   defaultDate,
-	}
-	expectedResult := service.ErrorInvalidTask
+		testTask := &task.Task{
+			ID:      "21aaa98b-842c-484a-a925-79aef811e68d",
+			UserID:  "user_id",
+			Summary: generateRandomString(t),
+			Date:    time.Now(),
+		}
 
-	err := testTaskValidator.Validate(testTask)
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
 
-	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
-		t.Logf(successTemplate, expectedResult, err)
-	} else {
-		t.Errorf(failedTemplate, expectedResult, err)
-	}
-}
+		testStringlength = 10
+	})
+	t.Run("should return error invalid task - empty date", func(t *testing.T) {
 
-func TestValidateTaskSummaryTooLong(t *testing.T) {
+		testStringlength = 2501
 
-	testTask := &task.Task{
-		ID:      defaultUUID,
-		UserID:  defaultUserID,
-		Summary: rand.String(failureSummaryLength),
-		Date:    defaultDate,
-	}
-	expectedResult := service.ErrorInvalidTask
+		testTask := &task.Task{
+			ID:      "21aaa98b-842c-484a-a925-79aef811e68d",
+			UserID:  "user_id",
+			Summary: generateRandomString(t),
+		}
 
-	err := testTaskValidator.Validate(testTask)
-
-	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
-		t.Logf(successTemplate, expectedResult, err)
-	} else {
-		t.Errorf(failedTemplate, expectedResult, err)
-	}
-}
-
-func TestValidateTaskEmptyDate(t *testing.T) {
-
-	testTask := &task.Task{
-		ID:      defaultUUID,
-		UserID:  defaultUserID,
-		Summary: rand.String(defaultSummaryLength),
-	}
-	expectedResult := service.ErrorInvalidTask
-
-	err := testTaskValidator.Validate(testTask)
-
-	if err != nil && errors.Is(err, service.ErrorInvalidTask) {
-		t.Logf(successTemplate, expectedResult, err)
-	} else {
-		t.Errorf(failedTemplate, expectedResult, err)
-	}
+		err := testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
 }
