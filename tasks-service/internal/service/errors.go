@@ -61,7 +61,7 @@ func parseExternalError(err error) error {
 			return returnError
 		}
 
-		log.Printf("unexpected error: %s", err.Error())
+		log.Printf("ERROR @TaskService: unexpected error: %s", err.Error())
 		return pkgError.NewError(ErrorUnexpectedError)
 	}
 

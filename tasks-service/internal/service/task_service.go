@@ -51,6 +51,13 @@ func (s *taskService) Create(ctx context.Context, summary string, date time.Time
 		return "", parseExternalError(err)
 	}
 
+	// encrypt summary
+	task.Summary, err = s.encryptor.Encrypt(task.Summary)
+	if err != nil {
+		return "", parseExternalError(err)
+	}
+
+	// persist
 	if err := s.repo.Insert(task); err != nil {
 		return "", parseExternalError(err)
 	}
@@ -66,11 +73,28 @@ func (s *taskService) List(ctx context.Context, userID *string) ([]*task.Task, e
 		return nil, err
 	}
 
+	// validate access
 	if userID == nil && !*serviceContext.IsManager {
 		return nil, pkgError.NewError(ErrorUserNotAllowed)
 	}
 
-	return s.repo.Search(userID)
+	// search
+	tasks, err := s.repo.Search(userID)
+	if err != nil {
+		return nil, parseExternalError(err)
+	}
+
+	// decrypt user tasks
+	for i := range tasks {
+		if tasks[i].UserID == serviceContext.UserID {
+			tasks[i].Summary, err = s.encryptor.Decrypt(tasks[i].Summary)
+			if err != nil {
+				return nil, parseExternalError(err)
+			}
+		}
+	}
+
+	return tasks, nil
 }
 
 // Retrieve ...
@@ -81,13 +105,23 @@ func (s *taskService) Retrieve(ctx context.Context, taskID string) (*task.Task, 
 		return nil, err
 	}
 
+	// find task
 	task, err := s.repo.Find(taskID)
 	if err != nil {
 		return nil, parseExternalError(err)
 	}
 
+	// validate access
 	if task.UserID != serviceContext.UserID && !*serviceContext.IsManager {
 		return nil, pkgError.NewError(ErrorUserNotAllowed)
+	}
+
+	// decrypt
+	if task.UserID == serviceContext.UserID {
+		task.Summary, err = s.encryptor.Decrypt(task.Summary)
+		if err != nil {
+			return nil, parseExternalError(err)
+		}
 	}
 
 	return task, nil
@@ -101,11 +135,13 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 		return err
 	}
 
-	task, err := s.Retrieve(ctx, taskID)
+	// find
+	task, err := s.repo.Find(taskID)
 	if err != nil {
 		return parseExternalError(err)
 	}
 
+	// validate access
 	if task.UserID != serviceContext.UserID {
 		return pkgError.NewError(ErrorUserNotAllowed)
 	}
@@ -127,6 +163,13 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 		return parseExternalError(err)
 	}
 
+	// encrypt summary
+	task.Summary, err = s.encryptor.Encrypt(task.Summary)
+	if err != nil {
+		return parseExternalError(err)
+	}
+
+	// update
 	err = s.repo.Update(taskID, summary, date)
 	if err != nil {
 		return parseExternalError(err)
@@ -143,10 +186,12 @@ func (s *taskService) Delete(ctx context.Context, taskID string) error {
 		return err
 	}
 
+	// validate access
 	if !*serviceContext.IsManager {
 		return pkgError.NewError(ErrorUserNotAllowed)
 	}
 
+	// delete
 	err = s.repo.Delete(taskID)
 	if err != nil {
 		return parseExternalError(err)
