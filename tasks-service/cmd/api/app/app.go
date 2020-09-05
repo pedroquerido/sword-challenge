@@ -13,6 +13,7 @@ import (
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/config"
 	repoGorm "github.com/pedroquerido/sword-challenge/tasks-service/internal/repo/gorm"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router"
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/request"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/server"
 	"gorm.io/driver/mysql"
@@ -55,9 +56,10 @@ func (t *TaskAPI) Run() error {
 	// setup repo
 	taskRepo := repoGorm.NewTaskRepository(db)
 
-	// create validator
+	// create validators
 	validate := validator.New()
 	taskValidator := task.NewValidator(validate)
+	requestValidator := request.NewValidator(validate)
 
 	// create Encryptor
 	encryptor, err := aes.NewEncryptor(cfg.EncryptionKey)
@@ -69,7 +71,7 @@ func (t *TaskAPI) Run() error {
 	service := service.NewTaskService(taskRepo, taskValidator, encryptor)
 
 	// Setup router
-	router := router.New(cfg.HTTP.Path, service, validate)
+	router := router.New(cfg.HTTP.Path, service, requestValidator)
 
 	// Create and start HTTP server
 	httpServer := server.NewHTTPServer("tasks http", cfg.HTTP.Port, router.GetHTTPHandler())

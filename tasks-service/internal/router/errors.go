@@ -4,6 +4,8 @@ import (
 	"errors"
 	"log"
 	"net/http"
+
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/request"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/response"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
 	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
@@ -11,19 +13,13 @@ import (
 
 const (
 	messageBadRequest          = "bad request"
+	messageForbidden           = "forbidden"
+	messageNotFound            = "not found"
 	messageUnprocessableEntity = "unprocessable entity"
 	messageInternal            = "unknown error"
 )
 
-var (
-	// ErrorBadRequest represents the error obtained from validating a request body that does not meet requirements
-	ErrorBadRequest = errors.New("bad request")
-
-	// ErrorUnknown represents the default error
-	ErrorUnknown = errors.New("unknown error")
-)
-
-func parseError(err error) *response.ErrorResponse {
+func buildErrorResponse(err error) *response.ErrorResponse {
 
 	if err != nil {
 
@@ -31,19 +27,45 @@ func parseError(err error) *response.ErrorResponse {
 			structuredError pkgError.Error
 		)
 
-		if errors.As(err, &structuredError) {
+		if errors.Is(err, request.ErrorBadRequest) {
 
-			if errors.Is(err, ErrorBadRequest) {
+			if errors.As(err, &structuredError) {
 				return response.NewErrorResponse(http.StatusBadRequest, messageBadRequest, structuredError.GetDetails()...)
 			}
 
-			if errors.Is(err, service.ErrorInvalidTask) {
-				return response.NewErrorResponse(http.StatusUnprocessableEntity, messageUnprocessableEntity, structuredError.GetDetails()...)
-			}
+			return response.NewErrorResponse(http.StatusBadRequest, messageBadRequest, err.Error())
 		}
 
+		if errors.Is(err, service.ErrorUserNotAllowed) {
+
+			if errors.As(err, &structuredError) {
+				return response.NewErrorResponse(http.StatusForbidden, messageForbidden)
+			}
+
+			return response.NewErrorResponse(http.StatusForbidden, messageForbidden)
+		}
+
+		if errors.Is(err, service.ErrorTaskNotFound) {
+
+			if errors.As(err, &structuredError) {
+				return response.NewErrorResponse(http.StatusNotFound, messageNotFound, structuredError.GetDetails()...)
+			}
+
+			return response.NewErrorResponse(http.StatusNotFound, messageNotFound, err.Error())
+		}
+
+		if errors.Is(err, service.ErrorInvalidTask) {
+
+			if errors.As(err, &structuredError) {
+				return response.NewErrorResponse(http.StatusUnprocessableEntity, messageUnprocessableEntity, structuredError.GetDetails()...)
+			}
+
+			return response.NewErrorResponse(http.StatusUnprocessableEntity, messageUnprocessableEntity, err.Error())
+		}
+
+		log.Printf("ERROR @HTTPRouter: unexpected error: %s", err.Error())
+		return response.NewErrorResponse(http.StatusInternalServerError, messageInternal)
 	}
 
-	log.Printf("%s: %s", messageInternal, err.Error())
-	return response.NewErrorResponse(http.StatusInternalServerError, messageInternal)
+	return nil
 }

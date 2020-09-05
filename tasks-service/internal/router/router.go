@@ -31,21 +31,22 @@ type Router struct {
 // New ...
 func New(basePath string, service service.TaskService, validator request.Validator) *Router {
 
+	r := mux.NewRouter()
+	r.Use([]mux.MiddlewareFunc{recoverFromPanic, setContentTypeJSON, requireHeaders}...)
+
 	router := &Router{
 		basePath:  basePath,
 		service:   service,
-		router:    mux.NewRouter(),
+		router:    r,
 		validator: validator,
 	}
-
-	router.setupRoutes()
 
 	return router
 }
 
 func (rt *Router) setupRoutes() {
 
-	rt.router.HandleFunc(rt.basePath+routeTasks, setMiddlewareJSON(rt.createTask)).Methods(methodPost)
+	rt.router.HandleFunc(rt.basePath+routeTasks, rt.createTask).Methods(methodPost)
 
 }
 

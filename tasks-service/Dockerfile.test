@@ -1,7 +1,5 @@
-# Golang build image
-FROM golang:1.15 as builder
+FROM golang:1.15
 
-# Maintainer
 LABEL maintainer="Pedro Querido <pedroquerido14@gmail.com>"
 
 RUN mkdir -p /github.com/pedroquerido/sword-challenge/tasks-service

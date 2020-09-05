@@ -31,7 +31,7 @@ func (rt *Router) createTask(w http.ResponseWriter, r *http.Request) {
 	// Validate Content
 	err = rt.validator.Validate(body)
 	if err != nil {
-		errResponse := parseError(err)
+		errResponse := buildErrorResponse(err)
 		writeJSON(w, errResponse.Code, errResponse)
 		return
 	}
@@ -48,7 +48,7 @@ func (rt *Router) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 	taskID, err := rt.service.Create(context.WithValue(context.Background(), service.ContextKey, serviceContext), body.Summary, body.Date)
 	if err != nil {
-		errResponse := parseError(err)
+		errResponse := buildErrorResponse(err)
 		writeJSON(w, errResponse.Code, errResponse)
 		return
 	}

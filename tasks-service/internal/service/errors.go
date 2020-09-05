@@ -37,28 +37,21 @@ func parseExternalError(err error) error {
 
 		if errors.Is(err, task.ErrorInvalidTask) {
 
-			returnError := pkgError.NewError(ErrorInvalidTask)
-
 			if errors.As(err, &structuredError) {
-				returnError = returnError.WithDetails(structuredError.GetDetails()...)
-			} else {
-				returnError = returnError.WithDetails(err.Error())
+				return pkgError.NewError(ErrorInvalidTask).WithDetails(structuredError.GetDetails()...)
 			}
 
-			return returnError
+			return pkgError.NewError(ErrorInvalidTask).WithDetails(err.Error())
 		}
 
 		if errors.Is(err, repo.ErrorNotFound) {
 
-			returnError := pkgError.NewError(ErrorTaskNotFound)
-
 			if errors.As(err, &structuredError) {
-				returnError = returnError.WithDetails(structuredError.GetDetails()...)
-			} else {
-				returnError = returnError.WithDetails(err.Error())
+				return pkgError.NewError(ErrorTaskNotFound).WithDetails(structuredError.GetDetails()...)
 			}
 
-			return returnError
+			return pkgError.NewError(ErrorTaskNotFound).WithDetails(err.Error())
+
 		}
 
 		log.Printf("ERROR @TaskService: unexpected error: %s", err.Error())
