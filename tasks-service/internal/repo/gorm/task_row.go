@@ -12,7 +12,7 @@ type taskRow struct {
 	ID        uint64    `gorm:"colummn:id;primary_key;auto_increment;"`
 	TaskID    string    `gorm:"colummn:task_id;not null; unique;"`
 	UserID    string    `gorm:"collumn:user_id;not null;"`
-	Summary   string    `gorm:"collumn:summary;size:2500;not null;"`
+	Summary   string    `gorm:"collumn:summary;not null;"`
 	Date      time.Time `gorm:"collumn:date;not null"`
 	CreatedAt time.Time `gorm:"collumn:created_at"`
 	UpdatedAt time.Time `gorm:"collumn:updated_at"`

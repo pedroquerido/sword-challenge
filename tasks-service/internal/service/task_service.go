@@ -23,11 +23,11 @@ type TaskService interface {
 
 type taskService struct {
 	repo      repo.TaskRepository
-	validator TaskValidator
+	validator task.Validator
 }
 
 // NewTaskService initializes and returns a new taskService implementation of TaskService
-func NewTaskService(repo repo.TaskRepository, validator TaskValidator) TaskService {
+func NewTaskService(repo repo.TaskRepository, validator task.Validator) TaskService {
 
 	return &taskService{
 		repo:      repo,
@@ -43,13 +43,18 @@ func (s *taskService) Create(ctx context.Context, summary string, date time.Time
 		return "", err
 	}
 
-	task := task.NewTask(serviceContext.UserID, summary, date)
-	if err := s.validator.Validate(task); err != nil {
-		return "", err
+	// validate task
+	task := task.New(serviceContext.UserID, summary, date)
+	if errs := s.validator.Validate(task); errs != nil {
+		details := make([]string, 0, len(errs))
+		for i := range errs {
+			details = append(details, errs[i].Error())
+		}
+		return "", pkgError.NewError(ErrorInvalidTask).WithDetails(details...)
 	}
 
 	if err := s.repo.Insert(task); err != nil {
-		return "", err
+		return "", pkgError.NewError(ErrorUnexpectedError).WithDetails(err.Error())
 	}
 
 	return task.ID, nil
@@ -109,7 +114,7 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 	}
 
 	if task.UserID != serviceContext.UserID {
-		return pkgError.NewError(ErrorTaskNotFound)
+		return pkgError.NewError(ErrorUserNotAllowed)
 	}
 
 	// Validate inputs
@@ -125,14 +130,18 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 		task.Date = *date
 	}
 
-	if err := s.validator.Validate(task); err != nil {
-		return err
+	if errs := s.validator.Validate(task); errs != nil {
+		details := make([]string, 0, len(errs))
+		for i := range errs {
+			details = append(details, errs[i].Error())
+		}
+		return pkgError.NewError(ErrorInvalidTask).WithDetails(details...)
 	}
 
-	err = s.repo.Update(taskID, serviceContext.UserID, summary, date)
-	if err != nil { // should not really happen with all the previous validations
+	err = s.repo.Update(taskID, summary, date)
+	if err != nil {
 
-		if errors.Is(err, repo.ErrorNotFound) {
+		if errors.Is(err, repo.ErrorNotFound) { // should not really happen with all the previous validations
 			return pkgError.NewError(ErrorTaskNotFound)
 		}
 

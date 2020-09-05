@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
+
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/config"
 	repoGorm "github.com/pedroquerido/sword-challenge/tasks-service/internal/repo/gorm"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router"
@@ -53,9 +55,10 @@ func (t *TaskAPI) Run() error {
 
 	// Create validator
 	validate := validator.New()
+	taskValidator := task.NewValidator(validate)
 
 	// Setup business layer
-	service := service.NewTaskService(taskRepo, validate)
+	service := service.NewTaskService(taskRepo, taskValidator)
 
 	// Setup router
 	router := router.New(cfg.HTTP.Path, service, validate)

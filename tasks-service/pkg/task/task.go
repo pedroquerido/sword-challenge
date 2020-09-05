@@ -14,8 +14,8 @@ type Task struct {
 	Date    time.Time `json:"date" validate:"required"`
 }
 
-// NewTask ...
-func NewTask(userID, summary string, date time.Time) *Task {
+// New ...
+func New(userID, summary string, date time.Time) *Task {
 
 	return &Task{
 		ID:      uuid.New().String(),

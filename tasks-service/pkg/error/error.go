@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// Error represents a structure and set methods for better error handling
+// Error represents a simple structure with set methods for a more flexible error handling
 type Error struct {
 	error
 	details []string
@@ -21,6 +21,10 @@ func NewError(err error) Error {
 // Error returns error string representation
 func (c Error) Error() string {
 
+	if len(c.details) == 0 {
+		return fmt.Sprintf("%s", c.error.Error())
+	}
+
 	return fmt.Sprintf("%s: %v", c.error.Error(), c.details)
 }
 
@@ -30,16 +34,11 @@ func (c Error) Unwrap() error {
 	return c.error
 }
 
-// SetDetails sets context to error
-func (c Error) SetDetails(details ...string) {
-
-	c.details = details
-}
-
 // WithDetails sets context to error and is to be used in chain
 func (c Error) WithDetails(details ...string) Error {
 
-	c.details = details
+	c.details = make([]string, len(details))
+	copy(c.details, details)
 	return c
 }
 
