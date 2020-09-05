@@ -11,6 +11,7 @@ import (
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	repoGorm "github.com/pedroquerido/sword-challenge/tasks-service/internal/repo/gorm"
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
@@ -78,7 +79,7 @@ func TestTaskRepository_Insert(t *testing.T) {
 		}
 
 		err := testRepo.Insert(task)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 	})
 	t.Run("should return err", func(t *testing.T) {
 
@@ -92,7 +93,7 @@ func TestTaskRepository_Insert(t *testing.T) {
 		}
 
 		err := testRepo.Insert(task)
-		assert.NotNil(t, err)
+		require.NotNil(t, err)
 	})
 }
 
@@ -104,21 +105,21 @@ func TestTaskRepository_Search(t *testing.T) {
 	t.Run("should find all tasks", func(t *testing.T) {
 
 		tasks, err := testRepo.Search(nil)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		assert.NotNil(t, tasks)
 		assert.Equal(t, 3, len(tasks))
 	})
 	t.Run("should find only user tasks", func(t *testing.T) {
 
 		tasks, err := testRepo.Search(&testTaskUserID)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		assert.NotNil(t, tasks)
 		assert.Equal(t, 1, len(tasks))
 	})
 	t.Run("should find no tasks", func(t *testing.T) {
 
 		tasks, err := testRepo.Search(&noTasksUserID)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		assert.NotNil(t, tasks)
 		assert.Equal(t, 0, len(tasks))
 	})
@@ -142,7 +143,7 @@ func TestTaskRepository_Find(t *testing.T) {
 		}
 
 		task, err := testRepo.Find(testTaskID)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		assert.NotNil(t, task)
 		assert.Equal(t, expectedTask.ID, task.ID)
 		assert.Equal(t, expectedTask.UserID, task.UserID)
@@ -152,8 +153,8 @@ func TestTaskRepository_Find(t *testing.T) {
 	t.Run("should return err not found", func(t *testing.T) {
 
 		task, err := testRepo.Find(notFoundTaskID)
+		require.NotNil(t, err)
 		assert.Nil(t, task)
-		assert.NotNil(t, err)
 		assert.True(t, errors.Is(err, repo.ErrorNotFound))
 	})
 }
@@ -171,7 +172,7 @@ func TestTaskRepository_Update(t *testing.T) {
 		assert.Nil(t, err)
 
 		task, err := testRepo.Find(testTaskID)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		assert.Equal(t, updateSummary, task.Summary)
 		// assert.Equal(t, updateDate, task.Date) // TODO: comeback to this
 	})
@@ -190,7 +191,7 @@ func TestTaskRepository_Delete(t *testing.T) {
 	t.Run("should delete task with task id", func(t *testing.T) {
 
 		err := testRepo.Delete(testTaskID)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 
 		task, err := testRepo.Find(testTaskID)
 		assert.Nil(t, task)
@@ -200,7 +201,7 @@ func TestTaskRepository_Delete(t *testing.T) {
 	t.Run("should return err not found", func(t *testing.T) {
 
 		err := testRepo.Delete(testTaskID)
-		assert.NotNil(t, err)
+		require.NotNil(t, err)
 		assert.True(t, errors.Is(err, repo.ErrorNotFound))
 	})
 }

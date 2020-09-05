@@ -11,6 +11,8 @@ import (
 	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
 )
 
+var _ Encryptor = (*encryptor)(nil)
+
 // Encryptor ...
 type Encryptor interface {
 	Encrypt(value string) (string, error)

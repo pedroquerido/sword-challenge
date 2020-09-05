@@ -6,6 +6,7 @@ import (
 
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/google/uuid"
 )
@@ -25,7 +26,7 @@ func TestNew(t *testing.T) {
 		assert.NotNil(t, task.ID)
 
 		generatedUUID, err := uuid.Parse(task.ID)
+		require.Nil(t, err)
 		assert.NotNil(t, generatedUUID)
-		assert.Nil(t, err)
 	})
 }

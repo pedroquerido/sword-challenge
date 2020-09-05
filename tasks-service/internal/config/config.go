@@ -1,6 +1,10 @@
 package config
 
-import "sync"
+import (
+	"log"
+	"os"
+	"sync"
+)
 
 var (
 	instance Values
@@ -9,21 +13,34 @@ var (
 
 const (
 	envVarNotDefined = "env var %s not defined\n"
+
+	encryptionKey = "AES_ENCRYPTION_KEY"
 )
 
-// Values ...
+// Values represents the structure of the application's configurations
 type Values struct {
-	DB   Database
-	HTTP HTTP
+	DB            Database
+	HTTP          HTTP
+	EncryptionKey string
 }
 
-// Get ...
+// Get returns the Values singleton
 func Get() *Values {
 
 	once.Do(func() {
 
+		// load db
 		instance.DB.load()
+
+		// load http
 		instance.HTTP.load()
+
+		// encryption key
+		if value, ok := os.LookupEnv(encryptionKey); ok {
+			instance.EncryptionKey = value
+		} else {
+			log.Fatalf(envVarNotDefined, encryptionKey)
+		}
 	})
 
 	return &instance

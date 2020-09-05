@@ -6,10 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
-	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
+
+	repoMock "github.com/pedroquerido/sword-challenge/tasks-service/internal/repo/mock"
+	aesMock "github.com/pedroquerido/sword-challenge/tasks-service/pkg/aes/mock"
+	taskMock "github.com/pedroquerido/sword-challenge/tasks-service/pkg/task/mock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -17,9 +20,10 @@ import (
 func TestTaskService_Create(t *testing.T) {
 
 	ctlr := gomock.NewController(t)
-	repo := repo.NewMockTaskRepository(ctlr)
-	validator := task.NewMockValidator(ctlr)
-	testService := service.NewTaskService(repo, validator)
+	repo := repoMock.NewMockTaskRepository(ctlr)
+	validator := taskMock.NewMockValidator(ctlr)
+	encryptor := aesMock.NewMockEncryptor(ctlr)
+	testService := service.NewTaskService(repo, validator, encryptor)
 
 	isManager := false
 	testContext := service.Context{
@@ -29,7 +33,7 @@ func TestTaskService_Create(t *testing.T) {
 
 	t.Run("should return error missing context", func(t *testing.T) {
 		taskID, err := testService.Create(context.Background(), "summary", time.Now())
-		assert.NotNil(t, err)
+		require.NotNil(t, err)
 		assert.True(t, errors.Is(err, service.ErrorMissingContext))
 		assert.Equal(t, taskID, "")
 	})

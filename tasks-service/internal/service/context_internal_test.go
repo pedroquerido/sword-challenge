@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseContext(t *testing.T) {
@@ -21,7 +22,7 @@ func TestParseContext(t *testing.T) {
 		}
 
 		serviceContext, err := parseContext(context.WithValue(context.Background(), ContextKey, testContext))
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		assert.Equal(t, &testContext, serviceContext)
 	})
 	t.Run("should return missing context - bad context", func(t *testing.T) {
@@ -29,8 +30,8 @@ func TestParseContext(t *testing.T) {
 		testContext := "bad context"
 
 		serviceContext, err := parseContext(context.WithValue(context.Background(), ContextKey, testContext))
+		require.NotNil(t, err)
 		assert.Nil(t, serviceContext)
-		assert.NotNil(t, err)
 		assert.True(t, errors.Is(err, ErrorMissingContext))
 	})
 	t.Run("should return missing context - missing user", func(t *testing.T) {
@@ -40,8 +41,8 @@ func TestParseContext(t *testing.T) {
 		}
 
 		serviceContext, err := parseContext(context.WithValue(context.Background(), ContextKey, testContext))
+		require.NotNil(t, err)
 		assert.Nil(t, serviceContext)
-		assert.NotNil(t, err)
 		assert.True(t, errors.Is(err, ErrorMissingContext))
 	})
 	t.Run("should return missing context - missing is_manager", func(t *testing.T) {
@@ -51,8 +52,8 @@ func TestParseContext(t *testing.T) {
 		}
 
 		serviceContext, err := parseContext(context.WithValue(context.Background(), ContextKey, testContext))
+		require.NotNil(t, err)
 		assert.Nil(t, serviceContext)
-		assert.NotNil(t, err)
 		assert.True(t, errors.Is(err, ErrorMissingContext))
 	})
 }

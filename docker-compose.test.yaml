@@ -26,8 +26,6 @@ services:
       - HTTP_PORT=:${TASKS_HTTP_PORT}
       - HTTP_PATH=/${TASKS_HTTP_PATH}
     restart: on-failure
-    volumes:
-      - ./:/app
     depends_on:
       - mysql-sc_test
     networks:

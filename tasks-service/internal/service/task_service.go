@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/aes"
 	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 )
@@ -24,14 +24,16 @@ type TaskService interface {
 type taskService struct {
 	repo      repo.TaskRepository
 	validator task.Validator
+	encryptor aes.Encryptor
 }
 
 // NewTaskService initializes and returns a new taskService implementation of TaskService
-func NewTaskService(repo repo.TaskRepository, validator task.Validator) TaskService {
+func NewTaskService(repo repo.TaskRepository, validator task.Validator, encryptor aes.Encryptor) TaskService {
 
 	return &taskService{
 		repo:      repo,
 		validator: validator,
+		encryptor: encryptor,
 	}
 }
 
@@ -45,16 +47,12 @@ func (s *taskService) Create(ctx context.Context, summary string, date time.Time
 
 	// validate task
 	task := task.New(serviceContext.UserID, summary, date)
-	if errs := s.validator.Validate(task); errs != nil {
-		details := make([]string, 0, len(errs))
-		for i := range errs {
-			details = append(details, errs[i].Error())
-		}
-		return "", pkgError.NewError(ErrorInvalidTask).WithDetails(details...)
+	if err := s.validator.Validate(task); err != nil {
+		return "", parseExternalError(err)
 	}
 
 	if err := s.repo.Insert(task); err != nil {
-		return "", pkgError.NewError(ErrorUnexpectedError).WithDetails(err.Error())
+		return "", parseExternalError(err)
 	}
 
 	return task.ID, nil
@@ -85,16 +83,11 @@ func (s *taskService) Retrieve(ctx context.Context, taskID string) (*task.Task, 
 
 	task, err := s.repo.Find(taskID)
 	if err != nil {
-
-		if errors.Is(err, repo.ErrorNotFound) {
-			return nil, pkgError.NewError(ErrorTaskNotFound)
-		}
-
-		return nil, err
+		return nil, parseExternalError(err)
 	}
 
 	if task.UserID != serviceContext.UserID && !*serviceContext.IsManager {
-		return nil, pkgError.NewError(ErrorTaskNotFound)
+		return nil, pkgError.NewError(ErrorUserNotAllowed)
 	}
 
 	return task, nil
@@ -110,7 +103,7 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 
 	task, err := s.Retrieve(ctx, taskID)
 	if err != nil {
-		return err
+		return parseExternalError(err)
 	}
 
 	if task.UserID != serviceContext.UserID {
@@ -130,22 +123,13 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 		task.Date = *date
 	}
 
-	if errs := s.validator.Validate(task); errs != nil {
-		details := make([]string, 0, len(errs))
-		for i := range errs {
-			details = append(details, errs[i].Error())
-		}
-		return pkgError.NewError(ErrorInvalidTask).WithDetails(details...)
+	if err := s.validator.Validate(task); err != nil {
+		return parseExternalError(err)
 	}
 
 	err = s.repo.Update(taskID, summary, date)
 	if err != nil {
-
-		if errors.Is(err, repo.ErrorNotFound) { // should not really happen with all the previous validations
-			return pkgError.NewError(ErrorTaskNotFound)
-		}
-
-		return err
+		return parseExternalError(err)
 	}
 
 	return nil
@@ -165,12 +149,7 @@ func (s *taskService) Delete(ctx context.Context, taskID string) error {
 
 	err = s.repo.Delete(taskID)
 	if err != nil {
-
-		if errors.Is(err, repo.ErrorNotFound) {
-			return pkgError.NewError(ErrorTaskNotFound)
-		}
-
-		return err
+		return parseExternalError(err)
 	}
 
 	return nil

@@ -1,6 +1,14 @@
 package service
 
-import "errors"
+import (
+	"errors"
+	"log"
+
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
+
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
+	pkgError "github.com/pedroquerido/sword-challenge/tasks-service/pkg/error"
+)
 
 var (
 	// ErrorInvalidTask represents the error obtained if a task fails to meet requirements
@@ -18,3 +26,44 @@ var (
 	// ErrorUnexpectedError represents the error obtained if something unexpected happened
 	ErrorUnexpectedError = errors.New("unexpected error")
 )
+
+func parseExternalError(err error) error {
+
+	if err != nil {
+
+		var (
+			structuredError pkgError.Error
+		)
+
+		if errors.Is(err, task.ErrorInvalidTask) {
+
+			returnError := pkgError.NewError(ErrorInvalidTask)
+
+			if errors.As(err, &structuredError) {
+				returnError = returnError.WithDetails(structuredError.GetDetails()...)
+			} else {
+				returnError = returnError.WithDetails(err.Error())
+			}
+
+			return returnError
+		}
+
+		if errors.Is(err, repo.ErrorNotFound) {
+
+			returnError := pkgError.NewError(ErrorTaskNotFound)
+
+			if errors.As(err, &structuredError) {
+				returnError = returnError.WithDetails(structuredError.GetDetails()...)
+			} else {
+				returnError = returnError.WithDetails(err.Error())
+			}
+
+			return returnError
+		}
+
+		log.Printf("unexpected error: %s", err.Error())
+		return pkgError.NewError(ErrorUnexpectedError)
+	}
+
+	return nil
+}

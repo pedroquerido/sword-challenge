@@ -8,6 +8,7 @@ import (
 
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFromTask(t *testing.T) {
@@ -23,7 +24,7 @@ func TestFromTask(t *testing.T) {
 	})
 	t.Run("should return empty task row", func(t *testing.T) {
 		emptyTaskRow := fromTask(nil)
-		assert.Equal(t, emptyTaskRow, &taskRow{})
+		assert.Equal(t, &taskRow{}, emptyTaskRow)
 	})
 }
 
@@ -38,7 +39,7 @@ func TestTaskRow_BeforeCreate(t *testing.T) {
 	t.Run("should set CreatedAt", func(t *testing.T) {
 		taskRow := fromTask(nil)
 		err := taskRow.BeforeCreate(nil)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		assert.False(t, taskRow.CreatedAt.IsZero())
 	})
 }
@@ -47,7 +48,7 @@ func TestTaskRow_BeforeUpdate(t *testing.T) {
 	t.Run("should set UpdatedAt", func(t *testing.T) {
 		taskRow := fromTask(nil)
 		err := taskRow.BeforeUpdate(nil)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		assert.False(t, taskRow.UpdatedAt.IsZero())
 	})
 }

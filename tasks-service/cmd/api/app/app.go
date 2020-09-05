@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/aes"
+
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/config"
@@ -41,24 +43,30 @@ func NewTaskAPI(migrateDB bool) *TaskAPI {
 // Run ...
 func (t *TaskAPI) Run() error {
 
-	// Load configs
+	// load configs
 	cfg := config.Get()
 
-	// Connect to db
+	// connect to db
 	db, err := connectToDB(cfg.DB)
 	if err != nil {
 		return err
 	}
 
-	// Setup repo
+	// setup repo
 	taskRepo := repoGorm.NewTaskRepository(db)
 
-	// Create validator
+	// create validator
 	validate := validator.New()
 	taskValidator := task.NewValidator(validate)
 
-	// Setup business layer
-	service := service.NewTaskService(taskRepo, taskValidator)
+	// create Encryptor
+	encryptor, err := aes.NewEncryptor(cfg.EncryptionKey)
+	if err != nil {
+		return err
+	}
+
+	// setup business layer
+	service := service.NewTaskService(taskRepo, taskValidator, encryptor)
 
 	// Setup router
 	router := router.New(cfg.HTTP.Path, service, validate)
