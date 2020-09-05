@@ -29,7 +29,7 @@ func (rt *Router) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate Content
-	err = rt.validate.Validate(body)
+	err = rt.validator.Validate(body)
 	if err != nil {
 		errResponse := parseError(err)
 		writeJSON(w, errResponse.Code, errResponse)

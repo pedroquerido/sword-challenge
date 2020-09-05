@@ -2,10 +2,11 @@ package router
 
 import (
 	"net/http"
+
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/request"
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
 
 	"github.com/gorilla/mux"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 const (
@@ -21,20 +22,20 @@ const (
 
 // Router ...
 type Router struct {
-	basePath string
-	service  service.TaskService
-	router   *mux.Router
-	validate *RequestValidator
+	basePath  string
+	service   service.TaskService
+	validator request.Validator
+	router    *mux.Router
 }
 
 // New ...
-func New(basePath string, service service.TaskService, validate *validator.Validate) *Router {
+func New(basePath string, service service.TaskService, validator request.Validator) *Router {
 
 	router := &Router{
-		basePath: basePath,
-		service:  service,
-		router:   mux.NewRouter(),
-		validate: NewRequestValidator(validate),
+		basePath:  basePath,
+		service:   service,
+		router:    mux.NewRouter(),
+		validator: validator,
 	}
 
 	router.setupRoutes()
