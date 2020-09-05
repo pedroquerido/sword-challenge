@@ -12,6 +12,7 @@ import (
 
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/service"
 
+	internalRepo "github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
 	repoMock "github.com/pedroquerido/sword-challenge/tasks-service/internal/repo/mock"
 	aesMock "github.com/pedroquerido/sword-challenge/tasks-service/pkg/aes/mock"
 	taskMock "github.com/pedroquerido/sword-challenge/tasks-service/pkg/task/mock"
@@ -53,6 +54,20 @@ func TestTaskService_Create(t *testing.T) {
 			"summary", time.Time{})
 		require.NotNil(t, err)
 		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+		assert.Equal(t, taskID, "")
+	})
+	t.Run("should return error unexpected error - failure on validate", func(t *testing.T) {
+
+		returnErr := errors.New("some random error")
+		validator.EXPECT().
+			Validate(gomock.Any()).
+			Times(1).
+			Return(returnErr)
+
+		taskID, err := testService.Create(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"summary", time.Now())
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
 		assert.Equal(t, taskID, "")
 	})
 	t.Run("should return error unexpected error - failure on encrypt", func(t *testing.T) {
@@ -148,7 +163,7 @@ func TestTaskService_List(t *testing.T) {
 		assert.True(t, errors.Is(err, service.ErrorUserNotAllowed))
 		assert.Equal(t, []*task.Task(nil), tasks)
 	})
-	t.Run("should return unexpected error - failure on search", func(t *testing.T) {
+	t.Run("should return error unexpected error - failure on search", func(t *testing.T) {
 
 		isManager := false
 		userID := "user_id"
@@ -171,7 +186,7 @@ func TestTaskService_List(t *testing.T) {
 		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
 		assert.Equal(t, returnTasks, tasks)
 	})
-	t.Run("should return unexpected error - failure on decrypt", func(t *testing.T) {
+	t.Run("should return error unexpected error - failure on decrypt", func(t *testing.T) {
 
 		isManager := false
 		userID := "user_id"
@@ -181,7 +196,12 @@ func TestTaskService_List(t *testing.T) {
 		}
 
 		returnTasks := []*task.Task{
-			task.New(userID, "summary", time.Now()),
+			&task.Task{
+				ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+				UserID:  userID,
+				Summary: "summary-1",
+				Date:    time.Now(),
+			},
 		}
 		returnErr := aes.ErrorEncryptedWithOtherEncryptor
 
@@ -295,7 +315,7 @@ func TestTaskService_Retrieve(t *testing.T) {
 		assert.True(t, errors.Is(err, service.ErrorMissingContext))
 		assert.Equal(t, (*task.Task)(nil), returnTask)
 	})
-	t.Run("should return unexpected error - failure on find", func(t *testing.T) {
+	t.Run("should return error unexpected error - failure on find", func(t *testing.T) {
 
 		isManager := false
 		testContext := service.Context{
@@ -314,6 +334,27 @@ func TestTaskService_Retrieve(t *testing.T) {
 			"419d535a-ced5-4d5e-8885-49df44d3f5ff")
 		require.NotNil(t, err)
 		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
+		assert.Equal(t, (*task.Task)(nil), returnTask)
+	})
+	t.Run("should return task not found error - failure on find", func(t *testing.T) {
+
+		isManager := false
+		testContext := service.Context{
+			UserID:    "user_id",
+			IsManager: &isManager,
+		}
+
+		returnErr := internalRepo.ErrorNotFound
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(nil, returnErr)
+
+		returnTask, err := testService.Retrieve(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff")
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorTaskNotFound))
 		assert.Equal(t, (*task.Task)(nil), returnTask)
 	})
 	t.Run("should return error user not allowed", func(t *testing.T) {
@@ -447,5 +488,383 @@ func TestTaskService_Retrieve(t *testing.T) {
 		require.Nil(t, err)
 		assert.NotNil(t, returnTaskSvc)
 		assert.Equal(t, expectedReturnTaskSvc, returnTaskSvc)
+	})
+}
+
+func TestTaskService_Update(t *testing.T) {
+
+	ctlr := gomock.NewController(t)
+	repo := repoMock.NewMockTaskRepository(ctlr)
+	validator := taskMock.NewMockValidator(ctlr)
+	encryptor := aesMock.NewMockEncryptor(ctlr)
+	testService := service.NewTaskService(repo, validator, encryptor)
+
+	t.Run("should return error missing context", func(t *testing.T) {
+
+		err := testService.Update(context.Background(), "419d535a-ced5-4d5e-8885-49df44d3f5ff", nil, nil)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorMissingContext))
+	})
+	t.Run("should return error unexpected error - failure on find", func(t *testing.T) {
+
+		isManager := false
+		testContext := service.Context{
+			UserID:    "user_id",
+			IsManager: &isManager,
+		}
+
+		returnErr := errors.New("some random error")
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(nil, returnErr)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", nil, nil)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
+	})
+	t.Run("should return task not found error - failure on find", func(t *testing.T) {
+
+		isManager := false
+		testContext := service.Context{
+			UserID:    "user_id",
+			IsManager: &isManager,
+		}
+
+		returnErr := internalRepo.ErrorNotFound
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(nil, returnErr)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", nil, nil)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorTaskNotFound))
+	})
+	t.Run("should return error user not allowed", func(t *testing.T) {
+
+		isManager := false
+		testContext := service.Context{
+			UserID:    "user_id",
+			IsManager: &isManager,
+		}
+
+		returnTaskRepo := &task.Task{
+			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+			UserID:  "user_id2",
+			Summary: "summary",
+			Date:    time.Now(),
+		}
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(returnTaskRepo, nil)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", nil, nil)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUserNotAllowed))
+	})
+	t.Run("should return no error - but do nothing", func(t *testing.T) {
+
+		isManager := false
+		userID := "user_id"
+		testContext := service.Context{
+			UserID:    userID,
+			IsManager: &isManager,
+		}
+
+		returnTaskRepo := &task.Task{
+			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+			UserID:  userID,
+			Summary: "summary",
+			Date:    time.Now(),
+		}
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(returnTaskRepo, nil)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", nil, nil)
+		require.Nil(t, err)
+	})
+	t.Run("should return error invalid task", func(t *testing.T) {
+
+		isManager := false
+		userID := "user_id"
+		testContext := service.Context{
+			UserID:    userID,
+			IsManager: &isManager,
+		}
+
+		returnTaskRepo := &task.Task{
+			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+			UserID:  userID,
+			Summary: "summary",
+			Date:    time.Now(),
+		}
+
+		updateSummary := ""
+		updateDate := time.Time{}
+		returnError := task.ErrorInvalidTask
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(returnTaskRepo, nil)
+		validator.EXPECT().
+			Validate(gomock.Any()).
+			Times(1).
+			Return(returnError)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", &updateSummary, &updateDate)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorInvalidTask))
+	})
+	t.Run("should return error unexpected error - failure on validate", func(t *testing.T) {
+
+		isManager := false
+		userID := "user_id"
+		testContext := service.Context{
+			UserID:    userID,
+			IsManager: &isManager,
+		}
+
+		returnTaskRepo := &task.Task{
+			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+			UserID:  userID,
+			Summary: "summary",
+			Date:    time.Now(),
+		}
+
+		updateSummary := "summary 2"
+		returnError := errors.New("some random error")
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(returnTaskRepo, nil)
+		validator.EXPECT().
+			Validate(gomock.Any()).
+			Times(1).
+			Return(returnError)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", &updateSummary, nil)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
+	})
+	t.Run("should return unexpected error - failure on encrypt", func(t *testing.T) {
+
+		isManager := false
+		userID := "user_id"
+		testContext := service.Context{
+			UserID:    userID,
+			IsManager: &isManager,
+		}
+
+		returnTaskRepo := &task.Task{
+			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+			UserID:  userID,
+			Summary: "summary",
+			Date:    time.Now(),
+		}
+
+		updateSummary := "summary2"
+		returnError := errors.New("some random error")
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(returnTaskRepo, nil)
+		validator.EXPECT().
+			Validate(gomock.Any()).
+			Times(1).
+			Return(nil)
+		encryptor.EXPECT().
+			Encrypt(gomock.Any()).
+			Times(1).
+			Return("", returnError)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", &updateSummary, nil)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
+	})
+	t.Run("should return unexpected error - failure on update", func(t *testing.T) {
+
+		isManager := false
+		userID := "user_id"
+		testContext := service.Context{
+			UserID:    userID,
+			IsManager: &isManager,
+		}
+
+		returnTaskRepo := &task.Task{
+			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+			UserID:  userID,
+			Summary: "summary",
+			Date:    time.Now(),
+		}
+
+		updateSummary := "summary2"
+		encryptedSummary := "encrypted"
+		returnError := errors.New("some random error")
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(returnTaskRepo, nil)
+		validator.EXPECT().
+			Validate(gomock.Any()).
+			Times(1).
+			Return(nil)
+		encryptor.EXPECT().
+			Encrypt(gomock.Any()).
+			Times(1).
+			Return(encryptedSummary, nil)
+		repo.EXPECT().
+			Update(gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(returnError)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", &updateSummary, nil)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
+	})
+	t.Run("should return no error", func(t *testing.T) {
+
+		isManager := false
+		userID := "user_id"
+		testContext := service.Context{
+			UserID:    userID,
+			IsManager: &isManager,
+		}
+
+		returnTaskRepo := &task.Task{
+			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+			UserID:  userID,
+			Summary: "summary",
+			Date:    time.Now(),
+		}
+
+		updateSummary := "summary2"
+		encryptedSummary := "encrypted"
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(returnTaskRepo, nil)
+		validator.EXPECT().
+			Validate(gomock.Any()).
+			Times(1).
+			Return(nil)
+		encryptor.EXPECT().
+			Encrypt(gomock.Any()).
+			Times(1).
+			Return(encryptedSummary, nil)
+		repo.EXPECT().
+			Update(gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(nil)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", &updateSummary, nil)
+		require.Nil(t, err)
+	})
+}
+
+func TestTaskService_Delete(t *testing.T) {
+
+	ctlr := gomock.NewController(t)
+	repo := repoMock.NewMockTaskRepository(ctlr)
+	validator := taskMock.NewMockValidator(ctlr)
+	encryptor := aesMock.NewMockEncryptor(ctlr)
+	testService := service.NewTaskService(repo, validator, encryptor)
+
+	t.Run("should return error missing context", func(t *testing.T) {
+
+		err := testService.Delete(context.Background(), "419d535a-ced5-4d5e-8885-49df44d3f5ff")
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorMissingContext))
+	})
+	t.Run("should return error user not allowed", func(t *testing.T) {
+
+		isManager := false
+		testContext := service.Context{
+			UserID:    "user_id",
+			IsManager: &isManager,
+		}
+
+		err := testService.Delete(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff")
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUserNotAllowed))
+	})
+	t.Run("should return error task not found", func(t *testing.T) {
+
+		isManager := true
+		testContext := service.Context{
+			UserID:    "user_id",
+			IsManager: &isManager,
+		}
+
+		returnError := internalRepo.ErrorNotFound
+
+		repo.EXPECT().
+			Delete(gomock.Any()).
+			Times(1).
+			Return(returnError)
+
+		err := testService.Delete(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff")
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorTaskNotFound))
+	})
+	t.Run("should return error unexpected error - failure on delete", func(t *testing.T) {
+
+		isManager := true
+		testContext := service.Context{
+			UserID:    "user_id",
+			IsManager: &isManager,
+		}
+
+		returnError := errors.New("some random error")
+
+		repo.EXPECT().
+			Delete(gomock.Any()).
+			Times(1).
+			Return(returnError)
+
+		err := testService.Delete(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff")
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
+	})
+	t.Run("should return no error", func(t *testing.T) {
+
+		isManager := true
+		testContext := service.Context{
+			UserID:    "user_id",
+			IsManager: &isManager,
+		}
+
+		repo.EXPECT().
+			Delete(gomock.Any()).
+			Times(1).
+			Return(nil)
+
+		err := testService.Delete(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff")
+		require.Nil(t, err)
 	})
 }
