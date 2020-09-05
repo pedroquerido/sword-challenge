@@ -19,8 +19,8 @@ func TestSetContentTypeJSON(t *testing.T) {
 
 		testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			contentType := w.Header().Get("Content-Type")
-			assert.Equal(t, "application/json", contentType)
+			contentType := w.Header().Get(headerContentType)
+			assert.Equal(t, headerContentTypeValueJSON, contentType)
 		})
 
 		handlerToTest := setContentTypeJSON(testHandler)
@@ -90,6 +90,42 @@ func TestRequireHeaders(t *testing.T) {
 		require.Nil(t, err)
 
 		assert.Equal(t, http.StatusBadRequest, recorder.Code)
+		assert.Equal(t, expectedResponse.Code, outputResponse.Code)
+		assert.Equal(t, expectedResponse.Message, outputResponse.Message)
+		assert.Equal(t, expectedResponse.Errors, outputResponse.Errors)
+	})
+}
+
+func TestRequireRoleManager(t *testing.T) {
+
+	t.Run("should do nothing", func(t *testing.T) {
+
+		handlerToTest := requireRoleManager(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+
+		req := httptest.NewRequest(http.MethodGet, "/tests", nil)
+		req.Header.Set(headerUserRole, headerUserRoleValueManager)
+
+		recorder := httptest.NewRecorder()
+		handlerToTest.ServeHTTP(recorder, req)
+		assert.Equal(t, http.StatusOK, recorder.Code)
+		assert.Equal(t, "", recorder.Body.String())
+	})
+	t.Run("should return forbidden response", func(t *testing.T) {
+
+		expectedResponse := response.NewErrorResponse(http.StatusForbidden, messageForbidden)
+
+		handlerToTest := requireRoleManager(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+
+		req := httptest.NewRequest(http.MethodGet, "/tests", nil)
+
+		recorder := httptest.NewRecorder()
+		handlerToTest.ServeHTTP(recorder, req)
+
+		outputResponse := response.ErrorResponse{}
+		err := json.NewDecoder(recorder.Body).Decode(&outputResponse)
+		require.Nil(t, err)
+
+		assert.Equal(t, http.StatusForbidden, recorder.Code)
 		assert.Equal(t, expectedResponse.Code, outputResponse.Code)
 		assert.Equal(t, expectedResponse.Message, outputResponse.Message)
 		assert.Equal(t, expectedResponse.Errors, outputResponse.Errors)

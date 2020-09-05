@@ -11,9 +11,7 @@ import (
 func setContentTypeJSON(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		log.Println("here")
-
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, headerContentTypeValueJSON)
 		next.ServeHTTP(w, r)
 	})
 }
@@ -58,4 +56,16 @@ func requireHeaders(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func requireRoleManager(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		if role := r.Header.Get(headerUserRole); role != headerUserRoleValueManager {
+			errorResponse := response.NewErrorResponse(http.StatusForbidden, messageForbidden)
+			writeJSON(w, errorResponse.Code, errorResponse)
+		}
+
+		next(w, r)
+	}
 }
