@@ -1,171 +1,121 @@
 package response_test
 
 import (
-	"reflect"
-	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/response"
-	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 	"testing"
 	"time"
+
+	"github.com/pedroquerido/sword-challenge/tasks-service/internal/router/response"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
+	"github.com/stretchr/testify/assert"
 )
 
-const (
-	defaultSuccessStatusCode = 200
-	defaultSuccessMessage    = "OK"
+func TestNewCreateTaskResponse(t *testing.T) {
 
-	defaultTaskID1 = "8ec7e95c-53b9-480f-9af6-2a7156de8173"
-	defaultTaskID2 = "9c000a80-b55c-45c3-a14e-3219717667da"
+	t.Run("should return create task response", func(t *testing.T) {
 
-	defaultUserID1 = "user1"
-	defaultUserID2 = "user2"
+		message := "message"
+		code := 201
+		data := "task_id"
 
-	defaultSummary1 = "12345"
-	defaultSummary2 = "abcdefghijkl"
-)
-
-var (
-	defaultDate1 = time.Now()
-	defaultDate2 = time.Now().Add(-time.Duration(10))
-
-	defaultTask = &task.Task{
-		ID:      defaultTaskID1,
-		UserID:  defaultUserID1,
-		Summary: defaultSummary1,
-		Date:    defaultDate1,
-	}
-
-	defaultTasksList = []*task.Task{
-		defaultTask,
-		&task.Task{
-			ID:      defaultTaskID2,
-			UserID:  defaultUserID2,
-			Summary: defaultSummary2,
-			Date:    defaultDate2,
-		},
-	}
-)
-
-func TestNewCreateTaskResponseEqualsCreateTaskResponse(t *testing.T) {
-
-	successResponse := response.NewCreateTaskResponse(defaultSuccessStatusCode, defaultSuccessMessage, defaultTaskID1)
-
-	if successResponse.Message != defaultSuccessMessage {
-		t.Errorf(failedTemplate, defaultSuccessMessage, successResponse.Message)
-	} else {
-		t.Logf(successTemplate, defaultSuccessMessage, successResponse.Message)
-	}
-
-	if successResponse.Code != defaultSuccessStatusCode {
-		t.Errorf(failedTemplate, defaultSuccessStatusCode, successResponse.Code)
-	} else {
-		t.Logf(successTemplate, defaultSuccessStatusCode, successResponse.Code)
-	}
-
-	if successResponse.Data != defaultTaskID1 {
-		t.Errorf(failedTemplate, defaultTaskID1, successResponse.Data)
-	} else {
-		t.Logf(successTemplate, defaultTaskID1, successResponse.Data)
-	}
+		successResponse := response.NewCreateTaskResponse(code, message, data)
+		assert.NotNil(t, successResponse)
+		assert.Equal(t, message, successResponse.Message)
+		assert.Equal(t, code, successResponse.Code)
+		assert.Equal(t, data, successResponse.Data)
+	})
 }
 
-func TestNewListTasksResponseEqualsListTasksResponse(t *testing.T) {
+func TestNewListTasksResponse(t *testing.T) {
 
-	successResponse := response.NewListTasksResponse(defaultSuccessStatusCode, defaultSuccessMessage, defaultTasksList)
+	t.Run("should return list tasks response", func(t *testing.T) {
 
-	if successResponse.Message != defaultSuccessMessage {
-		t.Errorf(failedTemplate, defaultSuccessMessage, successResponse.Message)
-	} else {
-		t.Logf(successTemplate, defaultSuccessMessage, successResponse.Message)
-	}
+		message := "message"
+		code := 200
+		data := []*task.Task{
+			&task.Task{
+				ID:      "task_id",
+				UserID:  "user_id",
+				Summary: "summary",
+				Date:    time.Now(),
+			},
+		}
 
-	if successResponse.Code != defaultSuccessStatusCode {
-		t.Errorf(failedTemplate, defaultSuccessStatusCode, successResponse.Code)
-	} else {
-		t.Logf(successTemplate, defaultSuccessStatusCode, successResponse.Code)
-	}
-
-	if reflect.DeepEqual(successResponse.Data, defaultTasksList) {
-		t.Logf(successTemplate, defaultTasksList, successResponse.Data)
-	} else {
-		t.Errorf(failedTemplate, defaultTasksList, successResponse.Data)
-	}
+		successResponse := response.NewListTasksResponse(code, message, data)
+		assert.NotNil(t, successResponse)
+		assert.Equal(t, message, successResponse.Message)
+		assert.Equal(t, code, successResponse.Code)
+		assert.Equal(t, data, successResponse.Data)
+	})
 }
 
-func TestNewListUserTasksResponseEqualsListUserTasksResponse(t *testing.T) {
+func TestNewListUserTasksResponse(t *testing.T) {
 
-	successResponse := response.NewListUserTasksResponse(defaultSuccessStatusCode, defaultSuccessMessage, defaultTasksList)
+	t.Run("should return list user tasks response", func(t *testing.T) {
 
-	if successResponse.Message != defaultSuccessMessage {
-		t.Errorf(failedTemplate, defaultSuccessMessage, successResponse.Message)
-	} else {
-		t.Logf(successTemplate, defaultSuccessMessage, successResponse.Message)
-	}
+		message := "message"
+		code := 200
+		data := []*task.Task{
+			&task.Task{
+				ID:      "task_id",
+				UserID:  "user_id",
+				Summary: "summary",
+				Date:    time.Now(),
+			},
+		}
 
-	if successResponse.Code != defaultSuccessStatusCode {
-		t.Errorf(failedTemplate, defaultSuccessStatusCode, successResponse.Code)
-	} else {
-		t.Logf(successTemplate, defaultSuccessStatusCode, successResponse.Code)
-	}
-
-	if reflect.DeepEqual(successResponse.Data, defaultTasksList) {
-		t.Logf(successTemplate, defaultTasksList, successResponse.Data)
-	} else {
-		t.Errorf(failedTemplate, defaultTasksList, successResponse.Data)
-	}
+		successResponse := response.NewListUserTasksResponse(code, message, data)
+		assert.NotNil(t, successResponse)
+		assert.Equal(t, message, successResponse.Message)
+		assert.Equal(t, code, successResponse.Code)
+		assert.Equal(t, data, successResponse.Data)
+	})
 }
 
-func TestNewRetrieveTaskResponseEqualsRetrieveTaskResponse(t *testing.T) {
+func TestNewRetrieveTaskResponse(t *testing.T) {
 
-	successResponse := response.NewRetrieveTaskResponse(defaultSuccessStatusCode, defaultSuccessMessage, defaultTask)
+	t.Run("should return retrieve task response", func(t *testing.T) {
 
-	if successResponse.Message != defaultSuccessMessage {
-		t.Errorf(failedTemplate, defaultSuccessMessage, successResponse.Message)
-	} else {
-		t.Logf(successTemplate, defaultSuccessMessage, successResponse.Message)
-	}
+		message := "message"
+		code := 200
+		data := &task.Task{
+			ID:      "task_id",
+			UserID:  "user_id",
+			Summary: "summary",
+			Date:    time.Now(),
+		}
 
-	if successResponse.Code != defaultSuccessStatusCode {
-		t.Errorf(failedTemplate, defaultSuccessStatusCode, successResponse.Code)
-	} else {
-		t.Logf(successTemplate, defaultSuccessStatusCode, successResponse.Code)
-	}
-
-	if reflect.DeepEqual(successResponse.Data, defaultTask) {
-		t.Logf(successTemplate, defaultTask, successResponse.Data)
-	} else {
-		t.Errorf(failedTemplate, defaultTask, successResponse.Data)
-	}
+		successResponse := response.NewRetrieveTaskResponse(code, message, data)
+		assert.NotNil(t, successResponse)
+		assert.Equal(t, message, successResponse.Message)
+		assert.Equal(t, code, successResponse.Code)
+		assert.Equal(t, data, successResponse.Data)
+	})
 }
 
-func TestNewUpdateTaskResponseEqualsUpdateTaskResponse(t *testing.T) {
+func TestNewUpdateTaskResponse(t *testing.T) {
 
-	successResponse := response.NewUpdateTaskResponse(defaultSuccessStatusCode, defaultSuccessMessage)
+	t.Run("should return update task response", func(t *testing.T) {
 
-	if successResponse.Message != defaultSuccessMessage {
-		t.Errorf(failedTemplate, defaultSuccessMessage, successResponse.Message)
-	} else {
-		t.Logf(successTemplate, defaultSuccessMessage, successResponse.Message)
-	}
+		message := "message"
+		code := 200
 
-	if successResponse.Code != defaultSuccessStatusCode {
-		t.Errorf(failedTemplate, defaultSuccessStatusCode, successResponse.Code)
-	} else {
-		t.Logf(successTemplate, defaultSuccessStatusCode, successResponse.Code)
-	}
+		successResponse := response.NewUpdateTaskResponse(code, message)
+		assert.NotNil(t, successResponse)
+		assert.Equal(t, message, successResponse.Message)
+		assert.Equal(t, code, successResponse.Code)
+	})
 }
 
-func TestNewDeleteTaskResponseEqualsDeleteTaskResponse(t *testing.T) {
+func TestNewDeleteTaskResponse(t *testing.T) {
 
-	successResponse := response.NewDeleteTaskResponse(defaultSuccessStatusCode, defaultSuccessMessage)
+	t.Run("should return update task response", func(t *testing.T) {
 
-	if successResponse.Message != defaultSuccessMessage {
-		t.Errorf(failedTemplate, defaultSuccessMessage, successResponse.Message)
-	} else {
-		t.Logf(successTemplate, defaultSuccessMessage, successResponse.Message)
-	}
+		message := "message"
+		code := 200
 
-	if successResponse.Code != defaultSuccessStatusCode {
-		t.Errorf(failedTemplate, defaultSuccessStatusCode, successResponse.Code)
-	} else {
-		t.Logf(successTemplate, defaultSuccessStatusCode, successResponse.Code)
-	}
+		successResponse := response.NewDeleteTaskResponse(code, message)
+		assert.NotNil(t, successResponse)
+		assert.Equal(t, message, successResponse.Message)
+		assert.Equal(t, code, successResponse.Code)
+	})
 }

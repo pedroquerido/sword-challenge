@@ -159,6 +159,7 @@ github.com/pedroquerido/sword-challenge v0.0.0-20200904010146-b90018488ca8 h1:us
 github.com/pedroquerido/sword-challenge v0.0.0-20200904220628-3bf5304b0757 h1:GTClFZvjfV+glZk22K3wCjhxsmghhUNlS05R1fu+X4k=
 github.com/pedroquerido/sword-challenge v0.0.0-20200905153741-8a21c3f06ea4 h1:8O0iWJiZoPcuMdsatl/zZs+MKcx173vlH9AO7mrY8+g=
 github.com/pedroquerido/sword-challenge v0.0.0-20200905171414-2d648b6e072b h1:HsUdMVbe020sM2bBAKBHM7liGLfSbME3lUjDZepGp5w=
+github.com/pedroquerido/sword-challenge v0.0.0-20200905191434-08b39515ea50 h1:xiyIEC46h8eou/qpnatkgDoBvKRgAAvbgKzwTJNiwu0=
 github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181zc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

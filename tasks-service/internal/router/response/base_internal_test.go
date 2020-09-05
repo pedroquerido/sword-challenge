@@ -4,55 +4,25 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-const (
-	defaultStatusCode = 200
-	defaultMessage    = "OK"
+func TestNewBaseResponse(t *testing.T) {
 
-	failedTemplate  = "FAILED - expected %v but got %v\n"
-	successTemplate = "PASSED - expected %v and got %v\n"
-)
+	t.Run("should return base response with generated uuid", func(t *testing.T) {
 
-func TestNewBaseResponseEqualsBaseResponse(t *testing.T) {
+		message := "message"
+		code := 200
 
-	baseResponse := newBaseResponse(defaultMessage, defaultStatusCode)
+		baseResponse := newBaseResponse(message, code)
+		assert.NotNil(t, baseResponse)
+		assert.Equal(t, message, baseResponse.Message)
+		assert.Equal(t, code, baseResponse.Code)
+		assert.NotNil(t, baseResponse.ID)
 
-	if baseResponse.Message != defaultMessage {
-		t.Errorf(failedTemplate, defaultMessage, baseResponse.Message)
-	} else {
-		t.Logf(successTemplate, defaultMessage, baseResponse.Message)
-	}
-
-	if baseResponse.Code != defaultStatusCode {
-		t.Errorf(failedTemplate, defaultStatusCode, baseResponse.Code)
-	} else {
-		t.Logf(successTemplate, defaultStatusCode, baseResponse.Code)
-	}
-}
-
-func TestNewBaseResponseGeneratesID(t *testing.T) {
-
-	const expectedID = "uuid"
-
-	baseResponse := newBaseResponse(defaultMessage, defaultStatusCode)
-
-	if baseResponse.ID == "" {
-		t.Errorf(failedTemplate, expectedID, baseResponse.ID)
-	} else {
-		t.Logf(successTemplate, expectedID, baseResponse.ID)
-	}
-}
-
-func TestNewBaseResponseIDisUUID(t *testing.T) {
-
-	const expectedID = "valid uuid"
-
-	baseResponse := newBaseResponse(defaultMessage, defaultStatusCode)
-
-	if _, err := uuid.Parse(baseResponse.ID); err != nil {
-		t.Errorf(failedTemplate, expectedID, err)
-	} else {
-		t.Logf(successTemplate, expectedID, baseResponse.ID)
-	}
+		generatedUUID, err := uuid.Parse(baseResponse.ID)
+		require.Nil(t, err)
+		assert.NotNil(t, generatedUUID)
+	})
 }
