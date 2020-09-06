@@ -27,6 +27,7 @@ func recoverFromPanic(next http.Handler) http.Handler {
 
 				errorResponse := response.NewErrorResponse(http.StatusInternalServerError, messageInternal)
 				writeJSON(w, errorResponse.Code, errorResponse)
+				return
 			}
 
 		}()
@@ -52,6 +53,7 @@ func requireHeaders(next http.Handler) http.Handler {
 		if len(missingHeaders) > 0 {
 			errorResponse := response.NewErrorResponse(http.StatusBadRequest, messageBadRequest, missingHeaders...)
 			writeJSON(w, errorResponse.Code, errorResponse)
+			return
 		}
 
 		next.ServeHTTP(w, r)
@@ -64,6 +66,7 @@ func requireRoleManager(next http.HandlerFunc) http.HandlerFunc {
 		if role := r.Header.Get(headerUserRole); role != headerUserRoleValueManager {
 			errorResponse := response.NewErrorResponse(http.StatusForbidden, messageForbidden)
 			writeJSON(w, errorResponse.Code, errorResponse)
+			return
 		}
 
 		next(w, r)

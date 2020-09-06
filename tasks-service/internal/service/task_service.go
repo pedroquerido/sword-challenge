@@ -74,7 +74,7 @@ func (s *taskService) List(ctx context.Context, userID *string) ([]*task.Task, e
 	}
 
 	// validate access
-	if userID == nil && !*serviceContext.IsManager {
+	if (userID == nil || *userID != serviceContext.UserID) && !*serviceContext.IsManager {
 		return nil, pkgError.NewError(ErrorUserNotAllowed)
 	}
 
