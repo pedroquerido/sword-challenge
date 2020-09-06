@@ -25,8 +25,6 @@ func (a *Auth) Run() error {
 	// load configs
 	cfg := config.Get()
 
-	log.Println(cfg)
-
 	// Setup router
 	router := router.New(cfg.Users.APIKeyUser, cfg.Users.UserRole)
 
