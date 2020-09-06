@@ -36,9 +36,6 @@ func (a *Auth) Run() error {
 	waitForSignal()
 	httpServer.Stop()
 
-	// Wait for signal and cleanup afterwards
-	waitForSignal()
-
 	return nil
 }
 

@@ -8,6 +8,8 @@ ADD . /app
 
 WORKDIR /app
 
+RUN go mod download
+
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ./bin/auth cmd/main.go
 
 ####
@@ -15,6 +17,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ./bin/auth cmd/ma
 FROM alpine:latest
 
 COPY --from=builder /app/bin/auth .
+
+COPY --from=builder /app/users.yaml .
 
 EXPOSE 8080
 

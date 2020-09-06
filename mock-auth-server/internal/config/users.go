@@ -16,19 +16,21 @@ type Users struct {
 
 func (u *Users) load() {
 
+	const errorLoadingUsers = "error loading users: %s\n"
+
 	filename, err := filepath.Abs("./users.yaml")
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatalf(errorLoadingUsers, err.Error())
 	}
 
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatalf(errorLoadingUsers, err.Error())
 	}
 
 	err = yaml.Unmarshal(file, u)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatalf(errorLoadingUsers, err.Error())
 	}
 
 }
