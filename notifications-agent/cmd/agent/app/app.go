@@ -1,9 +1,18 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
+
+	"github.com/pedroquerido/sword-challenge/notifications-agent/internal/config"
+	"github.com/streadway/amqp"
+)
+
+const (
+	// "amqp://guest:guest@localhost:5672"
+	rabbitMQConnectionURL = "amqp://%s:%s@%s"
 )
 
 // Agent ...
@@ -19,7 +28,13 @@ func NewAgent() *Agent {
 func (a *Agent) Run() error {
 
 	// load configs
-	//cfg := config.Get()
+	cfg := config.Get()
+
+	connection, err := amqp.Dial(fmt.Sprintf(rabbitMQConnectionURL, cfg.RabbitMQ.User, cfg.RabbitMQ.Password, cfg.RabbitMQ.Port))
+	if err != nil {
+		return err
+	}
+	defer connection.Close()
 
 	// Wait for signal and cleanup afterwards
 	waitForSignal()

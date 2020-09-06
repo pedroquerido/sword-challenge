@@ -25,8 +25,6 @@ import (
 const (
 	driverMySQL        = "mysql"
 	mySQLConnectionURL = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
-
-	dbConnectionError = "error connecting to db: %w"
 )
 
 // TaskAPI ...
@@ -100,7 +98,7 @@ func connectToDB(cfg config.Database) (db *gorm.DB, err error) {
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf(dbConnectionError, err)
+		return nil, fmt.Errorf("error connecting to db: %w", err)
 	}
 
 	return db, nil

@@ -33,6 +33,20 @@ services:
     networks:
       - sc-network
 
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: "rabbitmq"
+    hostname: "rabbitmq"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: "/"
+    restart: on-failure
+    ports:
+      - "${RABBITMQ_DASHBOARD_PORT}:${RABBITMQ_DASHBOARD_PORT}"
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
+
   mysql-sc:
     image: mysql:5.7
     container_name: "${MYSQL_HOST}"
@@ -66,6 +80,23 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.authserver.rule=PathPrefix(`/auth`)"
       - "traefik.http.routers.authserver.entrypoints=backend"
+
+  notifications-agent:
+    build:
+      context: ./notifications-agent
+      dockerfile: Dockerfile
+    container_name: "notifications-agent"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_PORT= :${RABBITMQ_PORT}
+      - RABBITMQ_USER= ${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD= ${RABBITMQ_PASSWORD}
+      - EXCHANGE= ${DEFAULT_EXCHANGE}
+      - QUEUE_NAME= ${NOTIFICATIONS_QUEUE_NAME}
+      - BINDING_KEY= ${TASK_CREATED_ROUTING_KEY}
+    networks:
+      - sc-network
 
   tasks-service:
     build:
