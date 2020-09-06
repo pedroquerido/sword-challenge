@@ -35,8 +35,8 @@ services:
 
   rabbitmq:
     image: "rabbitmq:3-management"
-    container_name: "rabbitmq"
-    hostname: "rabbitmq"
+    container_name: "${RABBITMQ_HOST}"
+    hostname: "${RABBITMQ_HOST}"
     environment:
       RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
@@ -46,6 +46,8 @@ services:
     ports:
       - "${RABBITMQ_DASHBOARD_PORT}:${RABBITMQ_DASHBOARD_PORT}"
       - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
+    networks:
+      - sc-network
 
   mysql-sc:
     image: mysql:5.7
@@ -74,6 +76,7 @@ services:
       - "${AUTH_HTTP_PORT}:${AUTH_HTTP_PORT}"
     environment:
       - HTTP_PORT=:${AUTH_HTTP_PORT}
+    restart: on-failure  
     networks:
       - sc-network
     labels:
@@ -89,12 +92,14 @@ services:
     depends_on:
       - rabbitmq
     environment:
-      - RABBITMQ_PORT= :${RABBITMQ_PORT}
-      - RABBITMQ_USER= ${RABBITMQ_USER}
-      - RABBITMQ_PASSWORD= ${RABBITMQ_PASSWORD}
-      - EXCHANGE= ${DEFAULT_EXCHANGE}
-      - QUEUE_NAME= ${NOTIFICATIONS_QUEUE_NAME}
-      - BINDING_KEY= ${TASK_CREATED_ROUTING_KEY}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=:${RABBITMQ_PORT}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - EXCHANGE=${DEFAULT_EXCHANGE}
+      - NOTIFICATIONS_QUEUE_NAME=${NOTIFICATIONS_QUEUE_NAME}
+      - TASK_CREATED_BINDING_KEY=${TASK_CREATED_ROUTING_KEY}
+    restart: on-failure
     networks:
       - sc-network
 

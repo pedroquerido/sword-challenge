@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/pedroquerido/sword-challenge/notifications-agent/cmd/app"
+	"github.com/pedroquerido/sword-challenge/notifications-agent/cmd/agent/app"
 )
 
 func main() {

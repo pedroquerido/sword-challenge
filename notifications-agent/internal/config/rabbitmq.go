@@ -6,16 +6,18 @@ import (
 )
 
 const (
+	rabbitHost     = "RABBITMQ_HOST"
 	rabbitPort     = "RABBITMQ_PORT"
 	rabbitUser     = "RABBITMQ_USER"
 	rabbitPassword = "RABBITMQ_PASSWORD"
-	queueName      = "NOTIFICATIONS_QUEUE_NAME"
 	exchange       = "EXCHANGE"
-	bindingKey     = "BINDING_KEY"
+	queueName      = "NOTIFICATIONS_QUEUE_NAME"
+	bindingKey     = "TASK_CREATED_BINDING_KEY"
 )
 
 // RabbitMQ contains the rabbitmq configuration values
 type RabbitMQ struct {
+	Host       string
 	Port       string
 	User       string
 	Password   string
@@ -25,6 +27,12 @@ type RabbitMQ struct {
 }
 
 func (http *RabbitMQ) load() {
+
+	if value, ok := os.LookupEnv(rabbitHost); ok {
+		http.Host = value
+	} else {
+		log.Fatalf(envVarNotDefined, rabbitHost)
+	}
 
 	if value, ok := os.LookupEnv(rabbitPort); ok {
 		http.Port = value
