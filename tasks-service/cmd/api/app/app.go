@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	mySQL              = "mysql"
+	driverMySQL        = "mysql"
 	mySQLConnectionURL = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
 
 	dbConnectionError = "error connecting to db: %w"
@@ -92,7 +92,7 @@ func (t *TaskAPI) Run() error {
 func connectToDB(cfg config.Database) (db *gorm.DB, err error) {
 
 	switch cfg.Driver {
-	case mySQL:
+	case driverMySQL:
 		url := fmt.Sprintf(mySQLConnectionURL, cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name)
 		db, err = gorm.Open(mysql.Open(url), &gorm.Config{})
 	default:
