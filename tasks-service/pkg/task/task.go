@@ -11,7 +11,7 @@ type Task struct {
 	ID      string    `json:"id" validate:"required,gt=0,uuid4"`
 	UserID  string    `json:"user_id" validate:"required,gt=0"`
 	Summary string    `json:"summary" validate:"required,gt=0,lte=2500"`
-	Date    time.Time `json:"date" validate:"required"`
+	Date    time.Time `json:"date" validate:"required,lte=0"`
 }
 
 // New ...

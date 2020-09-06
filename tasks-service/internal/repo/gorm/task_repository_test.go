@@ -67,7 +67,9 @@ func TestTaskRepository_Insert(t *testing.T) {
 	testTaskID := "9b150634-0fef-4913-b80e-29e5f3bbafec"
 	testTaskUserID := "user-test"
 	testTaskSummary := "summary-test"
-	testTaskDate := time.Now()
+	dateString := "2020-09-06T11:00:00Z"
+	testTaskDate, err := time.Parse(time.RFC3339, dateString)
+	require.Nil(t, err)
 
 	t.Run("should insert task without error", func(t *testing.T) {
 
@@ -130,7 +132,10 @@ func TestTaskRepository_Find(t *testing.T) {
 	testTaskID := "9b150634-0fef-4913-b80e-29e5f3bbafec"
 	testTaskUserID := "user-test"
 	testTaskSummary := "summary-test"
-	testTaskDate := time.Now()
+	dateString := "2020-09-06T11:00:00Z"
+	testTaskDate, err := time.Parse(time.RFC3339, dateString)
+	require.Nil(t, err)
+
 	notFoundTaskID := "b13c663c-40cf-4856-bc88-45818c1439ee"
 
 	t.Run("should find task from task id", func(t *testing.T) {
@@ -148,7 +153,7 @@ func TestTaskRepository_Find(t *testing.T) {
 		assert.Equal(t, expectedTask.ID, task.ID)
 		assert.Equal(t, expectedTask.UserID, task.UserID)
 		assert.Equal(t, expectedTask.Summary, task.Summary)
-		//assert.True(t, expectedTask.Date.Equal(task.Date)) // TODO: comeback to this
+		assert.True(t, expectedTask.Date.Equal(task.Date))
 	})
 	t.Run("should return err not found", func(t *testing.T) {
 
@@ -163,7 +168,9 @@ func TestTaskRepository_Update(t *testing.T) {
 
 	testTaskID := "9b150634-0fef-4913-b80e-29e5f3bbafec"
 	updateSummary := "summary-0"
-	updateDate := time.Now()
+	dateString := "2000-09-06T11:00:00Z"
+	updateDate, err := time.Parse(time.RFC3339, dateString)
+	require.Nil(t, err)
 	notFoundTaskID := "b13c663c-40cf-4856-bc88-45818c1439ee"
 
 	t.Run("should update summary and date on task with task id", func(t *testing.T) {
@@ -174,7 +181,7 @@ func TestTaskRepository_Update(t *testing.T) {
 		task, err := testRepo.Find(testTaskID)
 		require.Nil(t, err)
 		assert.Equal(t, updateSummary, task.Summary)
-		// assert.Equal(t, updateDate, task.Date) // TODO: comeback to this
+		assert.True(t, updateDate.Equal(task.Date))
 	})
 	t.Run("should return err not found with nonexisting task", func(t *testing.T) {
 

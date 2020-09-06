@@ -163,4 +163,21 @@ func TestValidator_Validate(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.True(t, errors.Is(err, task.ErrorInvalidTask))
 	})
+	t.Run("should return errors - future date", func(t *testing.T) {
+
+		dateString := "2021-01-01T00:01:00Z"
+		date, err := time.Parse(time.RFC3339, dateString)
+		require.Nil(t, err)
+
+		testTask := &task.Task{
+			ID:      "21aaa98b-842c-484a-a925-79aef811e68d",
+			UserID:  "user_id",
+			Summary: generateRandomString(t),
+			Date:    date,
+		}
+
+		err = testTaskValidator.Validate(testTask)
+		assert.NotNil(t, err)
+		assert.True(t, errors.Is(err, task.ErrorInvalidTask))
+	})
 }
