@@ -46,7 +46,6 @@ func (t *TaskAPI) Run() error {
 
 	// load configs
 	cfg := config.Get()
-	log.Println(cfg)
 
 	// connect to db
 	db, err := connectToDB(cfg.DB)
@@ -77,7 +76,7 @@ func (t *TaskAPI) Run() error {
 	service := service.NewTaskService(taskRepo, taskValidator, encryptor)
 
 	// Setup router
-	router := router.New(cfg.HTTP.Path, service, requestValidator)
+	router := router.New(service, requestValidator)
 
 	// Create and start HTTP server
 	httpServer := server.NewHTTPServer("tasks http", cfg.HTTP.Port, router.GetHTTPHandler())

@@ -24,7 +24,6 @@ services:
       - DB_PASSWORD=${MYSQL_TEST_PASSWORD}
       - DB_NAME=${MYSQL_TEST_TASKS_DB_NAME}
       - HTTP_PORT=:${TASKS_HTTP_PORT}
-      - HTTP_PATH=/${TASKS_HTTP_PATH}
     restart: on-failure
     depends_on:
       - mysql-sc_test

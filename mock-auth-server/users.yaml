@@ -1,0 +1,10 @@
+api-key-user:
+  518f9dae-571b-4c73-9af3-fcf90e67f063: 0ca0a7e2-dd7f-4c5d-b507-7a198e8c2dea
+  416947d1-4efd-4ea7-940c-67a61ec05cd6: 9dc194f6-51f7-4cdf-815e-c96fc0b4f88e
+  736411aa-83a6-4ef2-b964-2f513c789bbf: 8e08990d-8852-431f-bc1d-dfc69f1ad0b7
+  8a7b7d0b-2c87-490f-bea4-674c04fe3252: 588012f9-a313-4710-9dd1-230b1d276efe
+user-role:
+  0ca0a7e2-dd7f-4c5d-b507-7a198e8c2dea: technician
+  9dc194f6-51f7-4cdf-815e-c96fc0b4f88e: technician
+  8e08990d-8852-431f-bc1d-dfc69f1ad0b7: manager
+  588012f9-a313-4710-9dd1-230b1d276efe: manager

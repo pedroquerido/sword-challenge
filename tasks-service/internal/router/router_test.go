@@ -27,8 +27,7 @@ func TestRouter_CreateTask(t *testing.T) {
 	ctlr := gomock.NewController(t)
 	svc := serviceMock.NewMockTaskService(ctlr)
 	validator := requestMock.NewMockValidator(ctlr)
-	basePath := "/task"
-	testRouter := router.New(basePath, svc, validator)
+	testRouter := router.New(svc, validator)
 
 	headerUserID := "x-user-id"
 	headerUserRole := "x-user-role"
@@ -42,7 +41,7 @@ func TestRouter_CreateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPost, basePath+"/tasks", bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any_role")
 		require.Nil(t, err)
@@ -74,7 +73,7 @@ func TestRouter_CreateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPost, basePath+"/tasks", bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any_role")
 		require.Nil(t, err)
@@ -115,7 +114,7 @@ func TestRouter_CreateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPost, basePath+"/tasks", bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any_role")
 		require.Nil(t, err)
@@ -156,7 +155,7 @@ func TestRouter_CreateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPost, basePath+"/tasks", bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any_role")
 		require.Nil(t, err)
@@ -197,7 +196,7 @@ func TestRouter_CreateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPost, basePath+"/tasks", bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any_role")
 		require.Nil(t, err)
@@ -238,7 +237,7 @@ func TestRouter_CreateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPost, basePath+"/tasks", bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any_role")
 		require.Nil(t, err)
@@ -262,8 +261,7 @@ func TestRouter_ListTasks(t *testing.T) {
 	ctlr := gomock.NewController(t)
 	svc := serviceMock.NewMockTaskService(ctlr)
 	validator := requestMock.NewMockValidator(ctlr)
-	basePath := "/task"
-	testRouter := router.New(basePath, svc, validator)
+	testRouter := router.New(svc, validator)
 
 	headerUserID := "x-user-id"
 	headerUserRole := "x-user-role"
@@ -279,7 +277,7 @@ func TestRouter_ListTasks(t *testing.T) {
 			Times(1).
 			Return(nil, svcResponse)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks", nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks", nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -304,7 +302,7 @@ func TestRouter_ListTasks(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorMissingContext)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks", nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks", nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -329,7 +327,7 @@ func TestRouter_ListTasks(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorUnexpectedError)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks", nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks", nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -367,7 +365,7 @@ func TestRouter_ListTasks(t *testing.T) {
 			Times(1).
 			Return(svcResponse, nil)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks", nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks", nil)
 		req.Header.Set(headerUserID, userID)
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -406,7 +404,7 @@ func TestRouter_ListTasks(t *testing.T) {
 			Times(1).
 			Return(svcResponse, nil)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks?user_id="+userID, nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks?user_id="+userID, nil)
 		req.Header.Set(headerUserID, userID)
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -430,8 +428,7 @@ func TestRouter_RetrieveTask(t *testing.T) {
 	ctlr := gomock.NewController(t)
 	svc := serviceMock.NewMockTaskService(ctlr)
 	validator := requestMock.NewMockValidator(ctlr)
-	basePath := "/task"
-	testRouter := router.New(basePath, svc, validator)
+	testRouter := router.New(svc, validator)
 
 	headerUserID := "x-user-id"
 	headerUserRole := "x-user-role"
@@ -446,7 +443,7 @@ func TestRouter_RetrieveTask(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorUserNotAllowed)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -472,7 +469,7 @@ func TestRouter_RetrieveTask(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorTaskNotFound)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -498,7 +495,7 @@ func TestRouter_RetrieveTask(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorMissingContext)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -524,7 +521,7 @@ func TestRouter_RetrieveTask(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorUnexpectedError)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -561,7 +558,7 @@ func TestRouter_RetrieveTask(t *testing.T) {
 			Times(1).
 			Return(svcResponse, nil)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -585,8 +582,7 @@ func TestRouter_UpdateTask(t *testing.T) {
 	ctlr := gomock.NewController(t)
 	svc := serviceMock.NewMockTaskService(ctlr)
 	validator := requestMock.NewMockValidator(ctlr)
-	basePath := "/task"
-	testRouter := router.New(basePath, svc, validator)
+	testRouter := router.New(svc, validator)
 
 	headerUserID := "x-user-id"
 	headerUserRole := "x-user-role"
@@ -601,7 +597,7 @@ func TestRouter_UpdateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPatch, basePath+"/tasks/"+taskID, bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPatch, "/tasks/"+taskID, bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -634,7 +630,7 @@ func TestRouter_UpdateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPatch, basePath+"/tasks/"+taskID, bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPatch, "/tasks/"+taskID, bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -667,7 +663,7 @@ func TestRouter_UpdateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPatch, basePath+"/tasks/"+taskID, bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPatch, "/tasks/"+taskID, bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -705,7 +701,7 @@ func TestRouter_UpdateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPatch, basePath+"/tasks/"+taskID, bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPatch, "/tasks/"+taskID, bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -743,7 +739,7 @@ func TestRouter_UpdateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPatch, basePath+"/tasks/"+taskID, bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPatch, "/tasks/"+taskID, bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -781,7 +777,7 @@ func TestRouter_UpdateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPatch, basePath+"/tasks/"+taskID, bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPatch, "/tasks/"+taskID, bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -819,7 +815,7 @@ func TestRouter_UpdateTask(t *testing.T) {
 		body, err := json.Marshal(reqBody)
 		require.Nil(t, err)
 
-		req, err := http.NewRequest(http.MethodPatch, basePath+"/tasks/"+taskID, bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPatch, "/tasks/"+taskID, bytes.NewBuffer(body))
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -842,8 +838,7 @@ func TestRouter_DeleteTask(t *testing.T) {
 	ctlr := gomock.NewController(t)
 	svc := serviceMock.NewMockTaskService(ctlr)
 	validator := requestMock.NewMockValidator(ctlr)
-	basePath := "/task"
-	testRouter := router.New(basePath, svc, validator)
+	testRouter := router.New(svc, validator)
 
 	headerUserID := "x-user-id"
 	headerUserRole := "x-user-role"
@@ -859,7 +854,7 @@ func TestRouter_DeleteTask(t *testing.T) {
 			Times(1).
 			Return(service.ErrorUserNotAllowed)
 
-		req, err := http.NewRequest(http.MethodDelete, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodDelete, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -885,7 +880,7 @@ func TestRouter_DeleteTask(t *testing.T) {
 			Times(1).
 			Return(service.ErrorTaskNotFound)
 
-		req, err := http.NewRequest(http.MethodDelete, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodDelete, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -911,7 +906,7 @@ func TestRouter_DeleteTask(t *testing.T) {
 			Times(1).
 			Return(service.ErrorMissingContext)
 
-		req, err := http.NewRequest(http.MethodDelete, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodDelete, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -937,7 +932,7 @@ func TestRouter_DeleteTask(t *testing.T) {
 			Times(1).
 			Return(service.ErrorUnexpectedError)
 
-		req, err := http.NewRequest(http.MethodDelete, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodDelete, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -963,7 +958,7 @@ func TestRouter_DeleteTask(t *testing.T) {
 			Times(1).
 			Return(nil)
 
-		req, err := http.NewRequest(http.MethodDelete, basePath+"/tasks/"+taskID, nil)
+		req, err := http.NewRequest(http.MethodDelete, "/tasks/"+taskID, nil)
 		req.Header.Set(headerUserID, "user_id")
 		req.Header.Set(headerUserRole, headerUserRoleValueManager)
 		require.Nil(t, err)
@@ -986,8 +981,7 @@ func TestRouter_ListUserTasks(t *testing.T) {
 	ctlr := gomock.NewController(t)
 	svc := serviceMock.NewMockTaskService(ctlr)
 	validator := requestMock.NewMockValidator(ctlr)
-	basePath := "/task"
-	testRouter := router.New(basePath, svc, validator)
+	testRouter := router.New(svc, validator)
 
 	headerUserID := "x-user-id"
 	headerUserRole := "x-user-role"
@@ -1001,7 +995,7 @@ func TestRouter_ListUserTasks(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorUserNotAllowed)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/users/1/tasks", nil)
+		req, err := http.NewRequest(http.MethodGet, "/users/1/tasks", nil)
 		req.Header.Set(headerUserID, "2")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -1026,7 +1020,7 @@ func TestRouter_ListUserTasks(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorMissingContext)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/users/1/tasks", nil)
+		req, err := http.NewRequest(http.MethodGet, "/users/1/tasks", nil)
 		req.Header.Set(headerUserID, "1")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -1051,7 +1045,7 @@ func TestRouter_ListUserTasks(t *testing.T) {
 			Times(1).
 			Return(nil, service.ErrorUnexpectedError)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/users/1/tasks", nil)
+		req, err := http.NewRequest(http.MethodGet, "/users/1/tasks", nil)
 		req.Header.Set(headerUserID, "1")
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)
@@ -1089,7 +1083,7 @@ func TestRouter_ListUserTasks(t *testing.T) {
 			Times(1).
 			Return(svcResponse, nil)
 
-		req, err := http.NewRequest(http.MethodGet, basePath+"/users/"+userID+"/tasks", nil)
+		req, err := http.NewRequest(http.MethodGet, "/users/"+userID+"/tasks", nil)
 		req.Header.Set(headerUserID, userID)
 		req.Header.Set(headerUserRole, "any role")
 		require.Nil(t, err)

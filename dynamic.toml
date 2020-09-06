@@ -1,0 +1,10 @@
+################################################################
+# Middlewares
+################################################################
+
+[http.middlewares]
+
+  ## Forward Auth
+  [http.middlewares.fwd-auth.forwardAuth]
+    address = "http://localhost/auth"
+    authResponseHeaders = ["x-user-id", "x-user-role"]

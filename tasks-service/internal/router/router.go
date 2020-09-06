@@ -11,20 +11,18 @@ import (
 
 // Router ...
 type Router struct {
-	basePath  string
 	service   service.TaskService
 	validator request.Validator
 	router    *mux.Router
 }
 
 // New ...
-func New(basePath string, service service.TaskService, validator request.Validator) *Router {
+func New(service service.TaskService, validator request.Validator) *Router {
 
 	r := mux.NewRouter()
 	r.Use([]mux.MiddlewareFunc{recoverFromPanic, setContentTypeJSON, requireHeaders}...)
 
 	router := &Router{
-		basePath:  basePath,
 		service:   service,
 		router:    r,
 		validator: validator,
@@ -36,11 +34,8 @@ func New(basePath string, service service.TaskService, validator request.Validat
 }
 
 func (rt *Router) setupRoutes() {
-
-	subRouter := rt.router.PathPrefix(rt.basePath).Subrouter()
-
 	// /tasks
-	tasksSubRouter := subRouter.PathPrefix("/tasks").Subrouter()
+	tasksSubRouter := rt.router.PathPrefix("/tasks").Subrouter()
 	tasksSubRouter.HandleFunc("", rt.createTask).Methods(http.MethodPost)
 	tasksSubRouter.HandleFunc("", requireRoleManager(rt.listTasks)).Methods(http.MethodGet)
 	tasksSubRouter.HandleFunc("/{taskID}", rt.retrieveTask).Methods(http.MethodGet)
@@ -48,7 +43,7 @@ func (rt *Router) setupRoutes() {
 	tasksSubRouter.HandleFunc("/{taskID}", requireRoleManager(rt.deleteTask)).Methods(http.MethodDelete)
 
 	// /users
-	usersSubRouter := subRouter.PathPrefix("/users").Subrouter()
+	usersSubRouter := rt.router.PathPrefix("/users").Subrouter()
 	usersSubRouter.HandleFunc("/{userID}/tasks", rt.listUserTasks).Methods(http.MethodGet)
 }
 

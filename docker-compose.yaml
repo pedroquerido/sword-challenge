@@ -9,30 +9,27 @@ networks:
     driver: bridge
 
 services:
-  tasks-service:
-    build:
-      context: ./tasks-service
-      dockerfile: Dockerfile
-    container_name: tasks-service
+  traefik:
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    restart: always
+    command:
+      ## Log Settings
+      - "--log.level=DEBUG"
+      ## API Settings (not prod recomended)
+      - "--api.insecure=true"
+      ## Provider Settings
+      - "--providers.file.filename=/dynamic.toml"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      ## Entrypoints Settings
+      - "--entrypoints.backend.address=:${TRAEFIK_ENTRY_PORT}"
     ports:
-      - "${TASKS_HTTP_PORT}:${TASKS_HTTP_PORT}"
-    environment:
-      - DB_DRIVER=${TASKS_DB_DRIVER}
-      - DB_HOST=${MYSQL_HOST}
-      - DB_PORT=${MYSQL_PORT}
-      - DB_USER=${MYSQL_USER}
-      - DB_PASSWORD=${MYSQL_PASSWORD}
-      - DB_NAME=${MYSQL_TASKS_DB_NAME}
-      - HTTP_PORT=:${TASKS_HTTP_PORT}
-      - HTTP_PATH=/${TASKS_HTTP_PATH}
-      - AES_ENCRYPTION_KEY=${AES_ENCRYPTION_KEY}
-    restart: on-failure
+      - "${TRAEFIK_ENTRY_PORT}:${TRAEFIK_ENTRY_PORT}"
+      - "${TRAEFIK_DASHBOARD_PORT}:8080"
     volumes:
-      - ./:/app/bin/api
-    depends_on:
-      - mysql-sc
-    networks:
-      - sc-network
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - ./dynamic.toml:/dynamic.toml
 
   mysql-sc:
     image: mysql:5.7
@@ -49,3 +46,47 @@ services:
       - database_mysql:/var/lib/mysql
     networks:
       - sc-network
+
+  mock-auth-server:
+    build:
+      context: ./mock-auth-server
+      dockerfile: Dockerfile
+    container_name: "mock-auth-server"
+    depends_on:
+      - traefik
+    ports:
+      - "${AUTH_HTTP_PORT}:${AUTH_HTTP_PORT}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authserver.rule=PathPrefix(`/auth`)"
+      - "traefik.http.routers.authserver.entrypoints=backend"
+
+  tasks-service:
+    build:
+      context: ./tasks-service
+      dockerfile: Dockerfile
+    container_name: tasks-service
+    ports:
+      - "${TASKS_HTTP_PORT}:${TASKS_HTTP_PORT}"
+    environment:
+      - DB_DRIVER=${TASKS_DB_DRIVER}
+      - DB_HOST=${MYSQL_HOST}
+      - DB_PORT=${MYSQL_PORT}
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_NAME=${MYSQL_TASKS_DB_NAME}
+      - HTTP_PORT=:${TASKS_HTTP_PORT}
+      - AES_ENCRYPTION_KEY=${AES_ENCRYPTION_KEY}
+    restart: on-failure
+    depends_on:
+      - mysql-sc
+      - traefik
+    networks:
+      - sc-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=PathPrefix(`/task`)"
+      - "traefik.http.routers.whoami.entrypoints=backend"
+      - "traefik.http.routers.whoami.middlewares=fwd-auth@file"
+
+
