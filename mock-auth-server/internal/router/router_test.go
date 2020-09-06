@@ -12,9 +12,9 @@ import (
 
 func TestRouter_AuthHandler(t *testing.T) {
 
-	headerAPIKey := "x-api-key"
-	headerUserID := "x-user-id"
-	headerUserRole := "x-user-role"
+	headerAPIKey := "X-Api-Key"
+	headerUserID := "X-User-Id"
+	headerUserRole := "X-User-Role"
 
 	apiKeyUser := map[string]string{
 		"key1": "user1",

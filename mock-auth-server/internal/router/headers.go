@@ -1,7 +1,7 @@
 package router
 
 const (
-	headerAPIKey   = "x-api-key"
-	headerUserID   = "x-user-id"
-	headerUserRole = "x-user-role"
+	headerAPIKey   = "X-Api-Key"
+	headerUserID   = "X-User-Id"
+	headerUserRole = "X-User-Role"
 )

@@ -7,4 +7,7 @@
   ## Forward Auth
   [http.middlewares.fwd-auth.forwardAuth]
     address = "http://localhost/auth"
-    authResponseHeaders = ["x-user-id", "x-user-role"]
+    authResponseHeaders = ["X-User-Id", "X-User-Role"]
+  ## Strip Prefix
+  [http.middlewares.task-stripprefix.stripPrefix]
+    prefixes = ["/task"]

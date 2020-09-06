@@ -29,8 +29,8 @@ func TestRouter_CreateTask(t *testing.T) {
 	validator := requestMock.NewMockValidator(ctlr)
 	testRouter := router.New(svc, validator)
 
-	headerUserID := "x-user-id"
-	headerUserRole := "x-user-role"
+	headerUserID := "X-User-Id"
+	headerUserRole := "X-User-Role"
 
 	t.Run("should get response code 400 - bad request format", func(t *testing.T) {
 
@@ -263,8 +263,8 @@ func TestRouter_ListTasks(t *testing.T) {
 	validator := requestMock.NewMockValidator(ctlr)
 	testRouter := router.New(svc, validator)
 
-	headerUserID := "x-user-id"
-	headerUserRole := "x-user-role"
+	headerUserID := "X-User-Id"
+	headerUserRole := "X-User-Role"
 	headerUserRoleValueManager := "manager"
 
 	t.Run("should get response code 403", func(t *testing.T) {
@@ -430,8 +430,8 @@ func TestRouter_RetrieveTask(t *testing.T) {
 	validator := requestMock.NewMockValidator(ctlr)
 	testRouter := router.New(svc, validator)
 
-	headerUserID := "x-user-id"
-	headerUserRole := "x-user-role"
+	headerUserID := "X-User-Id"
+	headerUserRole := "X-User-Role"
 
 	t.Run("should get response code 403", func(t *testing.T) {
 
@@ -584,8 +584,8 @@ func TestRouter_UpdateTask(t *testing.T) {
 	validator := requestMock.NewMockValidator(ctlr)
 	testRouter := router.New(svc, validator)
 
-	headerUserID := "x-user-id"
-	headerUserRole := "x-user-role"
+	headerUserID := "X-User-Id"
+	headerUserRole := "X-User-Role"
 
 	t.Run("should get response code 400 - bad request format", func(t *testing.T) {
 
@@ -840,8 +840,8 @@ func TestRouter_DeleteTask(t *testing.T) {
 	validator := requestMock.NewMockValidator(ctlr)
 	testRouter := router.New(svc, validator)
 
-	headerUserID := "x-user-id"
-	headerUserRole := "x-user-role"
+	headerUserID := "X-User-Id"
+	headerUserRole := "X-User-Role"
 	headerUserRoleValueManager := "manager"
 
 	t.Run("should get response code 403", func(t *testing.T) {
@@ -983,8 +983,8 @@ func TestRouter_ListUserTasks(t *testing.T) {
 	validator := requestMock.NewMockValidator(ctlr)
 	testRouter := router.New(svc, validator)
 
-	headerUserID := "x-user-id"
-	headerUserRole := "x-user-role"
+	headerUserID := "X-User-Id"
+	headerUserRole := "X-User-Role"
 
 	t.Run("should get response code 403", func(t *testing.T) {
 

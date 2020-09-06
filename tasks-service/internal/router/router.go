@@ -20,7 +20,7 @@ type Router struct {
 func New(service service.TaskService, validator request.Validator) *Router {
 
 	r := mux.NewRouter()
-	r.Use([]mux.MiddlewareFunc{recoverFromPanic, setContentTypeJSON, requireHeaders}...)
+	r.Use([]mux.MiddlewareFunc{recoverFromPanic, setContentTypeJSON, requireHeaders, logIncomingRequest}...)
 
 	router := &Router{
 		service:   service,

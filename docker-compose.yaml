@@ -94,5 +94,6 @@ services:
       - "traefik.http.routers.task.rule=PathPrefix(`/task`)"
       - "traefik.http.routers.task.entrypoints=backend"
       - "traefik.http.routers.task.middlewares=fwd-auth@file"
+      - "traefik.http.routers.task.middlewares=task-stripprefix@file"
 
 

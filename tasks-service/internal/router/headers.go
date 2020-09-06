@@ -1,9 +1,9 @@
 package router
 
 const (
-	headerUserID = "x-user-id"
+	headerUserID = "X-User-Id"
 
-	headerUserRole             = "x-user-role"
+	headerUserRole             = "X-User-Role"
 	headerUserRoleValueManager = "manager"
 
 	headerContentType          = "Content-Type"

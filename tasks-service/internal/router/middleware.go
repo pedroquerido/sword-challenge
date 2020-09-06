@@ -60,6 +60,14 @@ func requireHeaders(next http.Handler) http.Handler {
 	})
 }
 
+func logIncomingRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		log.Printf("[%v] - %v - %v", r.Method, r.URL, r.Header)
+		next.ServeHTTP(w, r)
+	})
+}
+
 func requireRoleManager(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
