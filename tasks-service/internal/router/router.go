@@ -35,6 +35,23 @@ func New(basePath string, service service.TaskService, validator request.Validat
 	return router
 }
 
+func (rt *Router) setupRoutes() {
+
+	subRouter := rt.router.PathPrefix(rt.basePath).Subrouter()
+
+	// /tasks
+	tasksSubRouter := subRouter.PathPrefix("/tasks").Subrouter()
+	tasksSubRouter.HandleFunc("", rt.createTask).Methods(http.MethodPost)
+	tasksSubRouter.HandleFunc("", requireRoleManager(rt.listTasks)).Methods(http.MethodGet)
+	tasksSubRouter.HandleFunc("/{taskID}", rt.retrieveTask).Methods(http.MethodGet)
+	tasksSubRouter.HandleFunc("/{taskID}", rt.updateTask).Methods(http.MethodPatch)
+	tasksSubRouter.HandleFunc("/{taskID}", requireRoleManager(rt.deleteTask)).Methods(http.MethodDelete)
+
+	// /users
+	usersSubRouter := subRouter.PathPrefix("/users").Subrouter()
+	usersSubRouter.HandleFunc("/{userID}/tasks", rt.listUserTasks).Methods(http.MethodGet)
+}
+
 // GetHTTPHandler ...
 func (rt *Router) GetHTTPHandler() http.Handler {
 
