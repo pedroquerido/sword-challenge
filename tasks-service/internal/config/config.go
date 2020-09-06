@@ -21,6 +21,7 @@ const (
 type Values struct {
 	DB            Database
 	HTTP          HTTP
+	RabbitMQ      RabbitMQ
 	EncryptionKey string
 }
 
@@ -34,6 +35,9 @@ func Get() *Values {
 
 		// load http
 		instance.HTTP.load()
+
+		// load rabbitmq
+		instance.RabbitMQ.load()
 
 		// encryption key
 		if value, ok := os.LookupEnv(encryptionKey); ok {

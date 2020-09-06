@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/pedroquerido/sword-challenge/tasks-service/internal/repo"
@@ -25,15 +26,17 @@ type taskService struct {
 	repo      repo.TaskRepository
 	validator task.Validator
 	encryptor aes.Encryptor
+	publisher task.Publisher
 }
 
 // NewTaskService initializes and returns a new taskService implementation of TaskService
-func NewTaskService(repo repo.TaskRepository, validator task.Validator, encryptor aes.Encryptor) TaskService {
+func NewTaskService(repo repo.TaskRepository, validator task.Validator, encryptor aes.Encryptor, publisher task.Publisher) TaskService {
 
 	return &taskService{
 		repo:      repo,
 		validator: validator,
 		encryptor: encryptor,
+		publisher: publisher,
 	}
 }
 
@@ -60,6 +63,10 @@ func (s *taskService) Create(ctx context.Context, summary string, date time.Time
 	// persist
 	if err := s.repo.Insert(task); err != nil {
 		return "", parseExternalError(err)
+	}
+
+	if err := s.publisher.PublishTaskCreated(task); err != nil {
+		log.Printf("error publishing task created: %s", err.Error())
 	}
 
 	return task.ID, nil

@@ -28,7 +28,8 @@ func TestTaskService_Create(t *testing.T) {
 	repo := repoMock.NewMockTaskRepository(ctlr)
 	validator := taskMock.NewMockValidator(ctlr)
 	encryptor := aesMock.NewMockEncryptor(ctlr)
-	testService := service.NewTaskService(repo, validator, encryptor)
+	publisher := taskMock.NewMockPublisher(ctlr)
+	testService := service.NewTaskService(repo, validator, encryptor, publisher)
 
 	isManager := false
 	testContext := service.Context{
@@ -110,6 +111,30 @@ func TestTaskService_Create(t *testing.T) {
 		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
 		assert.Equal(t, taskID, "")
 	})
+	t.Run("should return taskID - failure on publish", func(t *testing.T) {
+
+		validator.EXPECT().
+			Validate(gomock.Any()).
+			Times(1).
+			Return(nil)
+		encryptor.EXPECT().
+			Encrypt(gomock.Any()).
+			Times(1).
+			Return("encrypted string", nil)
+		repo.EXPECT().
+			Insert(gomock.Any()).
+			Times(1).
+			Return(nil)
+		publisher.EXPECT().
+			PublishTaskCreated(gomock.Any()).
+			Times(1).
+			Return(task.ErrorPublishingTaskEvent)
+
+		taskID, err := testService.Create(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"summary", time.Now())
+		require.Nil(t, err)
+		assert.NotNil(t, taskID)
+	})
 	t.Run("should return taskID", func(t *testing.T) {
 
 		validator.EXPECT().
@@ -122,6 +147,10 @@ func TestTaskService_Create(t *testing.T) {
 			Return("encrypted string", nil)
 		repo.EXPECT().
 			Insert(gomock.Any()).
+			Times(1).
+			Return(nil)
+		publisher.EXPECT().
+			PublishTaskCreated(gomock.Any()).
 			Times(1).
 			Return(nil)
 
@@ -138,7 +167,8 @@ func TestTaskService_List(t *testing.T) {
 	repo := repoMock.NewMockTaskRepository(ctlr)
 	validator := taskMock.NewMockValidator(ctlr)
 	encryptor := aesMock.NewMockEncryptor(ctlr)
-	testService := service.NewTaskService(repo, validator, encryptor)
+	publisher := taskMock.NewMockPublisher(ctlr)
+	testService := service.NewTaskService(repo, validator, encryptor, publisher)
 
 	t.Run("should return error missing context", func(t *testing.T) {
 
@@ -306,7 +336,8 @@ func TestTaskService_Retrieve(t *testing.T) {
 	repo := repoMock.NewMockTaskRepository(ctlr)
 	validator := taskMock.NewMockValidator(ctlr)
 	encryptor := aesMock.NewMockEncryptor(ctlr)
-	testService := service.NewTaskService(repo, validator, encryptor)
+	publisher := taskMock.NewMockPublisher(ctlr)
+	testService := service.NewTaskService(repo, validator, encryptor, publisher)
 
 	t.Run("should return error missing context", func(t *testing.T) {
 
@@ -497,7 +528,8 @@ func TestTaskService_Update(t *testing.T) {
 	repo := repoMock.NewMockTaskRepository(ctlr)
 	validator := taskMock.NewMockValidator(ctlr)
 	encryptor := aesMock.NewMockEncryptor(ctlr)
-	testService := service.NewTaskService(repo, validator, encryptor)
+	publisher := taskMock.NewMockPublisher(ctlr)
+	testService := service.NewTaskService(repo, validator, encryptor, publisher)
 
 	t.Run("should return error missing context", func(t *testing.T) {
 
@@ -793,7 +825,8 @@ func TestTaskService_Delete(t *testing.T) {
 	repo := repoMock.NewMockTaskRepository(ctlr)
 	validator := taskMock.NewMockValidator(ctlr)
 	encryptor := aesMock.NewMockEncryptor(ctlr)
-	testService := service.NewTaskService(repo, validator, encryptor)
+	publisher := taskMock.NewMockPublisher(ctlr)
+	testService := service.NewTaskService(repo, validator, encryptor, publisher)
 
 	t.Run("should return error missing context", func(t *testing.T) {
 

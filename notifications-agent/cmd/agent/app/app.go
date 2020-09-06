@@ -13,7 +13,6 @@ import (
 )
 
 const (
-	// "amqp://guest:guest@localhost:5672"
 	rabbitMQConnectionURL = "amqp://%s:%s@%s%s"
 )
 
@@ -32,7 +31,7 @@ func (a *Agent) Run() error {
 	// load configs
 	cfg := config.Get()
 
-	// setup connection
+	// setup amqp connection
 	connection, err := amqp.Dial(fmt.Sprintf(rabbitMQConnectionURL, cfg.RabbitMQ.User, cfg.RabbitMQ.Password,
 		cfg.RabbitMQ.Host, cfg.RabbitMQ.Port))
 	if err != nil {

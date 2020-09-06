@@ -7,6 +7,8 @@ import (
 	"os/signal"
 
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/aes"
+	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task/rabbitmq"
+	"github.com/streadway/amqp"
 
 	"github.com/pedroquerido/sword-challenge/tasks-service/pkg/task"
 
@@ -23,8 +25,9 @@ import (
 )
 
 const (
-	driverMySQL        = "mysql"
-	mySQLConnectionURL = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
+	driverMySQL           = "mysql"
+	mySQLConnectionURL    = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
+	rabbitMQConnectionURL = "amqp://%s:%s@%s%s"
 )
 
 // TaskAPI ...
@@ -59,6 +62,20 @@ func (t *TaskAPI) Run() error {
 		}
 	}
 
+	// connect to rabbitmq
+	connection, err := amqp.Dial(fmt.Sprintf(rabbitMQConnectionURL, cfg.RabbitMQ.User, cfg.RabbitMQ.Password,
+		cfg.RabbitMQ.Host, cfg.RabbitMQ.Port))
+	if err != nil {
+		return err
+	}
+	defer connection.Close()
+
+	// setup publisher
+	taskPublisher, err := rabbitmq.NewTaskPublisher(connection, cfg.RabbitMQ.Exchange, cfg.RabbitMQ.TaskCreatedRoutingKey)
+	if err != nil {
+		return err
+	}
+
 	// create validators
 	validate := validator.New()
 	taskValidator := task.NewValidator(validate)
@@ -71,7 +88,7 @@ func (t *TaskAPI) Run() error {
 	}
 
 	// setup business layer
-	service := service.NewTaskService(taskRepo, taskValidator, encryptor)
+	service := service.NewTaskService(taskRepo, taskValidator, encryptor, taskPublisher)
 
 	// Setup router
 	router := router.New(service, requestValidator)
