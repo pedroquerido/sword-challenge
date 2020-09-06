@@ -147,7 +147,7 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 	}
 
 	// Validate inputs
-	if summary == nil && date == nil {
+	if (summary == nil && date == nil) || (*summary == task.Summary && *date == task.Date) {
 		return nil
 	}
 

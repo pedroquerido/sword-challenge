@@ -595,6 +595,39 @@ func TestTaskService_Update(t *testing.T) {
 			"419d535a-ced5-4d5e-8885-49df44d3f5ff", nil, nil)
 		require.Nil(t, err)
 	})
+	t.Run("should return unexpected error - failure on encrypt", func(t *testing.T) {
+
+		isManager := false
+		userID := "user_id"
+		testContext := service.Context{
+			UserID:    userID,
+			IsManager: &isManager,
+		}
+
+		returnTaskRepo := &task.Task{
+			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
+			UserID:  userID,
+			Summary: "summary",
+			Date:    time.Now(),
+		}
+
+		updateSummary := "summary2"
+		returnError := errors.New("some random error")
+
+		repo.EXPECT().
+			Find(gomock.Any()).
+			Times(1).
+			Return(returnTaskRepo, nil)
+		encryptor.EXPECT().
+			Encrypt(gomock.Any()).
+			Times(1).
+			Return("", returnError)
+
+		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
+			"419d535a-ced5-4d5e-8885-49df44d3f5ff", &updateSummary, nil)
+		require.NotNil(t, err)
+		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
+	})
 	t.Run("should return error invalid task", func(t *testing.T) {
 
 		isManager := false
@@ -611,7 +644,7 @@ func TestTaskService_Update(t *testing.T) {
 			Date:    time.Now(),
 		}
 
-		updateSummary := ""
+		updateSummary := "1"
 		updateDate := time.Time{}
 		returnError := task.ErrorInvalidTask
 
@@ -619,6 +652,10 @@ func TestTaskService_Update(t *testing.T) {
 			Find(gomock.Any()).
 			Times(1).
 			Return(returnTaskRepo, nil)
+		encryptor.EXPECT().
+			Encrypt(gomock.Any()).
+			Times(1).
+			Return("encrypted summary", nil)
 		validator.EXPECT().
 			Validate(gomock.Any()).
 			Times(1).
@@ -652,47 +689,14 @@ func TestTaskService_Update(t *testing.T) {
 			Find(gomock.Any()).
 			Times(1).
 			Return(returnTaskRepo, nil)
+		encryptor.EXPECT().
+			Encrypt(gomock.Any()).
+			Times(1).
+			Return("encrypted summary", nil)
 		validator.EXPECT().
 			Validate(gomock.Any()).
 			Times(1).
 			Return(returnError)
-
-		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
-			"419d535a-ced5-4d5e-8885-49df44d3f5ff", &updateSummary, nil)
-		require.NotNil(t, err)
-		assert.True(t, errors.Is(err, service.ErrorUnexpectedError))
-	})
-	t.Run("should return unexpected error - failure on encrypt", func(t *testing.T) {
-
-		isManager := false
-		userID := "user_id"
-		testContext := service.Context{
-			UserID:    userID,
-			IsManager: &isManager,
-		}
-
-		returnTaskRepo := &task.Task{
-			ID:      "419d535a-ced5-4d5e-8885-49df44d3f5ff",
-			UserID:  userID,
-			Summary: "summary",
-			Date:    time.Now(),
-		}
-
-		updateSummary := "summary2"
-		returnError := errors.New("some random error")
-
-		repo.EXPECT().
-			Find(gomock.Any()).
-			Times(1).
-			Return(returnTaskRepo, nil)
-		validator.EXPECT().
-			Validate(gomock.Any()).
-			Times(1).
-			Return(nil)
-		encryptor.EXPECT().
-			Encrypt(gomock.Any()).
-			Times(1).
-			Return("", returnError)
 
 		err := testService.Update(context.WithValue(context.Background(), service.ContextKey, testContext),
 			"419d535a-ced5-4d5e-8885-49df44d3f5ff", &updateSummary, nil)
