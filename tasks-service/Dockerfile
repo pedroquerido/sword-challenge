@@ -20,4 +20,4 @@ COPY --from=builder /app/bin/api .
 
 EXPOSE 8080
 
-ENTRYPOINT ["./api", "--auto-migrate"]
+ENTRYPOINT ["./api", "--run-migrations"]

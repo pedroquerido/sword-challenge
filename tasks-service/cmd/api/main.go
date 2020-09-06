@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	autoMigrate = flag.Bool("auto-migrate", false, "run db migrations on startup")
+	migrateDB = flag.Bool("run-migrations", false, "run db migrations on startup")
 )
 
 func main() {
 
 	flag.Parse()
 
-	app := app.NewTaskAPI(*autoMigrate)
+	app := app.NewTaskAPI(*migrateDB)
 	if err := app.Run(); err != nil {
 		log.Fatalln(err)
 	}

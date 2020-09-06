@@ -41,6 +41,8 @@ func New(basePath string, service service.TaskService, validator request.Validat
 		validator: validator,
 	}
 
+	router.setupRoutes()
+
 	return router
 }
 

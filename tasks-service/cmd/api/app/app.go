@@ -46,6 +46,7 @@ func (t *TaskAPI) Run() error {
 
 	// load configs
 	cfg := config.Get()
+	log.Println(cfg)
 
 	// connect to db
 	db, err := connectToDB(cfg.DB)
@@ -55,6 +56,11 @@ func (t *TaskAPI) Run() error {
 
 	// setup repo
 	taskRepo := repoGorm.NewTaskRepository(db)
+	if t.migrateDB {
+		if err := repoGorm.CreateTables(db); err != nil {
+			return err
+		}
+	}
 
 	// create validators
 	validate := validator.New()
