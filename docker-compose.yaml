@@ -30,6 +30,8 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - ./dynamic.toml:/dynamic.toml
+    networks:
+      - sc-network
 
   mysql-sc:
     image: mysql:5.7
@@ -58,6 +60,8 @@ services:
       - "${AUTH_HTTP_PORT}:${AUTH_HTTP_PORT}"
     environment:
       - HTTP_PORT=:${AUTH_HTTP_PORT}
+    networks:
+      - sc-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authserver.rule=PathPrefix(`/auth`)"
