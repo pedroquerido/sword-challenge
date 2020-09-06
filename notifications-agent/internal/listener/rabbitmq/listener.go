@@ -7,6 +7,8 @@ import (
 	"github.com/streadway/amqp"
 )
 
+var _ listener.EventListener = (*eventListener)(nil)
+
 type eventListener struct {
 	ch       *amqp.Channel
 	queue    amqp.Queue

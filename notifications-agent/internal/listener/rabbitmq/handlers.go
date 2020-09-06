@@ -25,7 +25,7 @@ func handleCreatedTask(event amqp.Delivery) {
 		}
 	}
 
-	log.Printf("new task: %s performed task %s at %s", task.UserID, task.ID, task.Date.String())
+	log.Printf("[NEW TASK] user %s performed task %s at %s", task.UserID, task.ID, task.Date.String())
 	if err := event.Ack(false); err != nil {
 		log.Printf("error acknoledging message: %s\n", event.MessageId)
 	}

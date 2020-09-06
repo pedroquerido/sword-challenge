@@ -119,9 +119,16 @@ services:
       - DB_NAME=${MYSQL_TASKS_DB_NAME}
       - HTTP_PORT=:${TASKS_HTTP_PORT}
       - AES_ENCRYPTION_KEY=${AES_ENCRYPTION_KEY}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=:${RABBITMQ_PORT}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - EXCHANGE=${DEFAULT_EXCHANGE}
+      - TASK_CREATED_ROUTING_KEY=${TASK_CREATED_ROUTING_KEY}
     restart: on-failure
     depends_on:
       - mysql-sc
+      - rabbitmq
       - traefik
     networks:
       - sc-network

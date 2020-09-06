@@ -3,6 +3,7 @@ module github.com/pedroquerido/sword-challenge/tasks-service
 go 1.15
 
 require (
+	github.com/NeowayLabs/wabbit v0.0.0-20200409220312-12e68ab5b0c6 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/golang/mock v1.4.4
 	github.com/google/uuid v1.1.1

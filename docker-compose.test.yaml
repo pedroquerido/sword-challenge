@@ -9,6 +9,23 @@ networks:
     driver: bridge
 
 services:
+
+  mysql-sc_test:
+    image: mysql:5.7
+    container_name: "${MYSQL_TEST_HOST}"
+    ports:
+      - "${MYSQL_TEST_PORT}:${MYSQL_TEST_PORT}"
+    environment:
+      - MYSQL_ROOT_HOST=${MYSQL_TEST_HOST} 
+      - MYSQL_USER=${MYSQL_TEST_USER}
+      - MYSQL_PASSWORD=${MYSQL_TEST_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_TEST_TASKS_DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_TEST_PASSWORD}
+    volumes:
+      - database_mysql_test:/var/lib/mysql
+    networks:
+      - sc-network_test
+
   tasks-service_test:
     build:
       context: ./tasks-service
@@ -30,18 +47,15 @@ services:
     networks:
       - sc-network_test
 
-  mysql-sc_test:
-    image: mysql:5.7
-    container_name: "${MYSQL_TEST_HOST}"
+  mock-auth-server_test:
+    build:
+      context: ./mock-auth-server
+      dockerfile: Dockerfile.test
+    container_name: "mock-auth-server_test"
     ports:
-      - "${MYSQL_TEST_PORT}:${MYSQL_TEST_PORT}"
+      - "${AUTH_HTTP_PORT}:${AUTH_HTTP_PORT}"
     environment:
-      - MYSQL_ROOT_HOST=${MYSQL_TEST_HOST} 
-      - MYSQL_USER=${MYSQL_TEST_USER}
-      - MYSQL_PASSWORD=${MYSQL_TEST_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_TEST_TASKS_DB_NAME}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_TEST_PASSWORD}
-    volumes:
-      - database_mysql_test:/var/lib/mysql
+      - HTTP_PORT=:${AUTH_HTTP_PORT}
+    restart: on-failure  
     networks:
       - sc-network_test
