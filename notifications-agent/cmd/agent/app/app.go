@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/pedroquerido/sword-challenge/notifications-agent/internal/listener/rabbitmq"
+
 	"github.com/pedroquerido/sword-challenge/notifications-agent/internal/config"
 	"github.com/streadway/amqp"
 )
@@ -30,14 +32,25 @@ func (a *Agent) Run() error {
 	// load configs
 	cfg := config.Get()
 
-	url := fmt.Sprintf(rabbitMQConnectionURL, cfg.RabbitMQ.User, cfg.RabbitMQ.Password, cfg.RabbitMQ.Host, cfg.RabbitMQ.Port)
-	log.Println(url)
-
-	connection, err := amqp.Dial(url)
+	// setup connection
+	connection, err := amqp.Dial(fmt.Sprintf(rabbitMQConnectionURL, cfg.RabbitMQ.User, cfg.RabbitMQ.Password,
+		cfg.RabbitMQ.Host, cfg.RabbitMQ.Port))
 	if err != nil {
 		return err
 	}
 	defer connection.Close()
+
+	// setup listener
+	eventListener, err := rabbitmq.NewEventListener(connection, cfg.RabbitMQ.Exchange, cfg.RabbitMQ.QueueName,
+		[]string{cfg.RabbitMQ.BindingKey}...)
+	if err != nil {
+		return err
+	}
+
+	// listen
+	if err := eventListener.Listen(); err != nil {
+		return err
+	}
 
 	// Wait for signal and cleanup afterwards
 	waitForSignal()
