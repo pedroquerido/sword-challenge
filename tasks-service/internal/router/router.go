@@ -9,17 +9,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	routeTasks        = "/tasks"
-	routeTasksID      = "/tasks/{taskID}"
-	routeUsersIDTasks = "/users/{userID/tasks"
-
-	methodPost   = "POST"
-	methodGet    = "GET"
-	methodPatch  = "PATCH"
-	methodDelete = "DELETE"
-)
-
 // Router ...
 type Router struct {
 	basePath  string
@@ -44,12 +33,6 @@ func New(basePath string, service service.TaskService, validator request.Validat
 	router.setupRoutes()
 
 	return router
-}
-
-func (rt *Router) setupRoutes() {
-
-	rt.router.HandleFunc(rt.basePath+routeTasks, rt.createTask).Methods(methodPost)
-
 }
 
 // GetHTTPHandler ...
