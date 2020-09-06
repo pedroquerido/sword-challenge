@@ -153,6 +153,12 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 
 	if summary != nil {
 		task.Summary = *summary
+
+		// encrypt summary
+		*summary, err = s.encryptor.Encrypt(*summary)
+		if err != nil {
+			return parseExternalError(err)
+		}
 	}
 
 	if date != nil {
@@ -160,12 +166,6 @@ func (s *taskService) Update(ctx context.Context, taskID string, summary *string
 	}
 
 	if err := s.validator.Validate(task); err != nil {
-		return parseExternalError(err)
-	}
-
-	// encrypt summary
-	task.Summary, err = s.encryptor.Encrypt(task.Summary)
-	if err != nil {
 		return parseExternalError(err)
 	}
 
