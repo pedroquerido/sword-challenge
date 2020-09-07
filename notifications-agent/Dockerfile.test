@@ -1,0 +1,13 @@
+FROM golang:1.15
+
+LABEL maintainer="Pedro Querido <pedroquerido14@gmail.com>"
+
+RUN mkdir -p /github.com/pedroquerido/sword-challenge/notifications-agent
+
+ADD . /github.com/pedroquerido/sword-challenge/notifications-agent
+
+WORKDIR /github.com/pedroquerido/sword-challenge/notifications-agent
+
+RUN go mod download
+
+CMD CGO_ENABLED=0 go test -v -cover ./...
