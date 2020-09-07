@@ -35,6 +35,7 @@ In addition to the modules described, the repo contains two docker-compose files
 ## Future Developments
 For a more "production ready" application, some key points that I would build upon with no order defined:
  - Improve logging and build upon error handling
- - Create deployment files for a Kubernetes integration
+ - Improve DB migrations
  - Setup documentation
+ - Create deployment files for a Kubernetes integration
  - Refine MySQL and RabbitMQ connections
