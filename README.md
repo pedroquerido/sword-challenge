@@ -33,7 +33,7 @@ A amqp-based consumer that listens on events published (for now, just the one ta
 In addition to the modules described, the repo contains two docker-compose files: one for setting up the application and the other for running the tests. It also contains a *dynamic.toml* file for  *traefik* configurations.
 
 ## Future Developments
-For a more "production ready" application, some key points that I would build upon with no order defined:
+For a more "production ready" application, some key points that I would build upon:
  - Improve logging and build upon error handling
  - Improve DB migrations
  - Setup proper documentation
