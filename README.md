@@ -33,9 +33,11 @@ A amqp-based consumer that listens on events published (for now, just the one ta
 In addition to the modules described, the repo contains two docker-compose files: one for setting up the application and the other for running the tests. It also contains a *dynamic.toml* file for  *traefik* configurations.
 
 ## Future Developments
-For a more "production ready" application, some key points that I would build upon:
+For a more "production ready" application, some key points to build upon:
+ - Add pagination to list requests
  - Improve logging and build upon error handling
  - Improve DB migrations
  - Setup proper documentation
- - Create deployment files for a Kubernetes integration
  - Refine MySQL and RabbitMQ connections
+ - Create deployment files for a possible Kubernetes integration
+
