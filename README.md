@@ -1,5 +1,5 @@
 # sword-challenge
-Sword Health Challenge
+Sword Challenge
 
 ## Modules
 - tasks-service - a RESTful API that provides actions on tasks
